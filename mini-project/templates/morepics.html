@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All pictures in {{stream_name}}</title>
+</head>
+<body>
+    {% include 'templates/header.html' %}
+    {% for photo_url in photo_url_list %}
+        <br><img src="{{photo_url}}" style="width:128px;height:128px;"></br>
+    {% endfor %}
+
+    <form action="/view?stream={{stream_name}}" method="get">
+        <input type="submit" value="Back"/>
+        <input type="hidden" value="{{stream_name}}" name="stream">
+    </form>
+
+</body>
+</html>

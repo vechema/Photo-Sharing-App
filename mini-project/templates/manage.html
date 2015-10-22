@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Streams</title>
+
+    <style type="text/css">
+    table.gridtable {
+        font-family: verdana,arial,sans-serif;
+        font-size:11px;
+        color:#333333;
+        border-width: 1px;
+        border-color: #666666;
+        border-collapse: collapse;
+    }
+    table.gridtable th {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #dedede;
+    }
+    table.gridtable td {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #ffffff;
+    }
+    </style>
+
+
+
+</head>
+<body>
+    {% include 'templates/header.html' %}
+    <h2>Welcome {{name}}</h2>
+    <form action="/delete" method="POST" >
+
+    {% if current_user.streams_own |length == 0 %}
+        <h4>Streams I own</h4>
+        <br>
+        You haven't created any streams yet. <a href="/create">Create one now!</a>
+    {% else %}
+
+    <br><table class="table table-hover"><h4>Streams I own</h4>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Last New Picture</th>
+            <th>Number of Pictures</th>
+            <th>Delete</th>
+        </tr>
+        </thead>
+    {% for key in current_user.streams_own %}
+        <tr>
+            <td><a href="/view?stream={{key.get().name}}">{{key.get().name}}</a></td>
+            <td>{{key.get().update_date}}</td>
+            <td>{{key.get().num_pics}}</td>
+            <td>
+                <input type="checkbox" name="stream_name" value="{{key.get().name}}">
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
+    <input type="submit" value="Delete" name="delete" />
+    </form>
+    {% endif %}
+
+    <br>
+    <br>
+
+    {% if current_user.streams_subscribe |length == 0 %}
+        <h4>Streams I subscribe to</h4>
+        <br>
+        You aren't subscribed to any streams yet! <a href="/viewall">Find streams to subscribe to!</a>
+    {% else %}
+
+    <form action="/unsubscribe" method="POST" >
+    <br><table class="table table-hover"><h4>Streams I subscribe to</h4>
+        <thead>
+            <th>Name</th>
+            <th>Last New Picture</th>
+            <th>Number of Pictures</th>
+            <th>Views</th>
+            <th>Unsubscribe</th>
+        </thead>
+
+
+
+    {% for key in current_user.streams_subscribe %}
+        <tr>
+            <td><a href="/view?stream={{key.get().name}}">{{key.get().name}}</a></td>
+            <td>{{key.get().update_date}}</td>
+            <td>{{key.get().num_pics}}</td>
+            <td>{{key.get().count}}</td>
+            <td>
+                <input type="checkbox" name="stream_name" value="{{key.get().name}}">
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
+    <input type="submit" value="Unsubscribe" name="unsubscribe" />
+    </form>
+{% endif %}
+</body>
+</html>

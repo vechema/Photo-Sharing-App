@@ -1,0 +1,20 @@
+cron:
+- description: update leaders
+  url: /update
+  schedule: every 5 minutes
+
+- description: send a trending report every five minutes to subscribers
+  url: /sendfive
+  schedule: every 5 minutes
+
+- description: send a trending report every hour to subscribers
+  url: /sendhour
+  schedule: every 60 minutes
+
+- description: send a trending report every day to subscribers
+  url: /sendday
+  schedule: every 24 hours
+
+- description: update the possible autocomplete options
+  url: /updatecache
+  schedule: every 5 minutes

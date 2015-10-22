@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+{% include 'templates/header.html' %}
+<head>
+    <meta charset="UTF-8">
+    <title>{{stream.name}}</title>
+
+    <script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="assests/css/dropzone.css">
+
+</head>
+<body>
+
+
+    {% if stream.key not in user.streams_subscribe %}
+    {% if stream.key not in user.streams_own %}
+    {% if user.email != 'dummy' %}
+    <form action="/subscribe" method="POST">
+        <input type="hidden" name="stream" value="{{stream.name}}">
+        <input type="submit" value="Subscribe" name="subscribe" />
+    </form>
+    {% endif %}
+    {% endif %}
+    {% endif %}
+
+    {% if user.email == 'dummy'%}
+    <form action="/error" method="get">
+        <input type="hidden" name="message" value="nosubscribe">
+        <input type="submit" value="Subscribe" name="subscribe" />
+    </form>
+    {% endif %}
+
+    <h3>{{stream.name}}</h3>
+
+{#    <table>#}
+        <div class = "row">
+
+    {% for photo_url in photo_url_list %}
+        {% if loop.index0 is divisibleby 6 %}
+            </div>
+            <div class = "row">
+        {% endif %}
+        <div class="col-sm-2">
+            <img src="{{photo_url}}" style="width:150px;height:150px;">
+            <br>
+            <br>
+        </div>
+    {% endfor %}
+        </div>
+{#    </table>#}
+
+    {%if num_pics > 3 %}
+    {%if not view_all%}
+    <form action="/view?stream={{stream.name}}" method="get">
+        <input type="hidden" name="stream" value="{{stream.name}}">
+        <input type="hidden" name="viewall" value="True">
+        <input type="submit" value="More Pictures" name="morepics" />
+    </form>
+    {% endif%}
+    {% endif%}
+
+    <!--Geo view button-->
+    <form action="/geo?stream={{stream.name}}" method="get">
+        <input type="hidden" name="stream" value="{{stream.name}}">
+        <input type="submit" value="Geo View" name="geoview" />
+    </form>
+
+    {% if stream.key in user.streams_own %}
+    <h3>Add an image</h3>
+    <!--<form action="{{upload_url}}" method="POST" enctype="multipart/form-data">-->
+        <!--<input type="hidden" name="stream" value="{{stream.name}}">-->
+        <!--<br><input type="text" name="file_name" placeholder="file name">-->
+        <!--<br><input type="text" name="comment" placeholder="comments">-->
+        <!--<br><input type="file" name="file">-->
+        <!--<br><input type="submit" name="submit" value="Submit">-->
+    <!--</form>-->
+
+    <form action="{{upload_url}}" class="dropzone" id="my-dropzone" method="post"
+            enctype="multipart/form-data">
+        <input type="hidden" name="stream" value="{{stream.name}}">
+    </form>
+    {% endif %}
+
+</body>
+</html>

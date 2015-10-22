@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+      <title>Search Results</title>
+    {% include 'templates/header.html' %}
+    <h2>Search Results</h2>
+</head>
+<body>
+{#{% include 'templates/search.html' %}#}
+<br>
+{% if count > 4 %}
+    There are <b>5</b> or more results for <b>{{ query }}</b>,
+{% elif count < 2%}
+    There is <b>{{ count }}</b> result for <b>{{ query }}</b>,
+{% else%}
+    There are <b>{{ count }}</b> results for <b>{{ query }}</b>,
+{% endif %}
+<br>
+     &nbsp click on an image to view stream
+<br>
+
+        <div class = "row">
+    {% for stream in streams %}
+
+        <div class = "col-sm-2"><a href="/view?stream={{stream.name_safe}}">
+            <img src="{{stream.cover_url}}" style="width:128px;height:128px;">
+        </a>
+        <br>{{stream.name}}</div>
+        <!--<ul id="categories">-->
+            <!--<li>subscribers-->
+                <!--<ul id="emaillist">-->
+                <!--{% for email in stream.subscribers %}-->
+                    <!--<li>{{email}}</li>-->
+                <!--{% endfor %}-->
+                <!--</ul>-->
+            <!--</li>-->
+            <!--<li>tags-->
+                <!--<ul id="taglist">-->
+                <!--{% for tag in stream.tags %}-->
+                    <!--<li>{{tag}}</li>-->
+                <!--{% endfor %}-->
+                <!--</ul>-->
+            <!--</li>-->
+            <!--<li>photos-->
+                <!--<ul id="photolist">-->
+                <!--{% for photo in stream.photos %}-->
+                    <!--<li>{{photo.name}}</li>-->
+                <!--{% endfor %}-->
+                <!--</ul>-->
+            <!--</li>-->
+        <!--</ul>-->
+    {% endfor %}
+        </div>
+    </table>
+</body>
+</html>
