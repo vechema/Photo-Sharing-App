@@ -7,6 +7,7 @@ import cgi
 import re
 import json
 import random
+import time
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -14,6 +15,7 @@ from google.appengine.ext import blobstore
 from google.appengine.api import mail
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.api.images import get_serving_url
+from google.appengine.api import files, images
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -1134,6 +1136,44 @@ class SearchResultsHandler(webapp2.RequestHandler):
 #         self.response.write(template.render(template_values))
 # >>>>>>> origin/master
 
+# Below here is mobile handlers
+
+class mGetUploadURL(webapp2.RequestHandler):
+    def get(self):
+        upload_url = blobstore.create_upload_url('/muploadHandler')
+        upload_url = str(upload_url)
+        dictPassed = {'upload_url':upload_url}
+        jsonObj = json.dumps(dictPassed, sort_keys=True,indent=4, separators=(',', ': '))
+        self.response.write(jsonObj)
+
+class mUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
+    def post(self):
+        upload = self.get_uploads()[0]
+        user_photo = Picture(blob_key=upload.key(), comment=self.request.params['photoCaption'])
+        user_photo.put()
+
+
+class mViewAllPhotos(webapp2.RequestHandler):
+    def get(self):
+        imageQuery = Picture.query()
+        imageList = []
+        imageURLList = []
+        imageCaptionList = []
+        for pic in imageQuery:
+            imageList.append(pic)
+
+        imageList = sorted(imageList, key=lambda k: k.upload_date,reverse = True)
+
+        for pic in imageList:
+            picURL = images.get_serving_url(pic.blob_key)
+            imageURLList.append(picURL)
+            imageCaptionList.append(pic.comment)
+
+        dictPassed = {'displayImages':imageURLList, 'imageCaptionList':imageCaptionList}
+        jsonObj = json.dumps(dictPassed, sort_keys=True,indent=4, separators=(',', ': '))
+        self.response.write(jsonObj)
+
+
 app = webapp2.WSGIApplication([
     ('/logincheck', LoginCheckHandler),
     ('/searchrequest', SearchRequestHandler),
@@ -1164,4 +1204,8 @@ app = webapp2.WSGIApplication([
     ('/sendhour', SendHourHandler),
     ('/sendday', SendDayHandler),
     # ('/test', TestHandler),
+    # below here is all mobile handlers
+    ('/mgetUploadURL',mGetUploadURL),
+    ('/muploadHandler', mUploadHandler),
+    ('/mviewAllPhotos', mViewAllPhotos)
     ], debug=True)

@@ -130,7 +130,7 @@ public class ImageUpload extends ActionBarActivity {
 
     private void getUploadURL(final byte[] encodedImage, final String photoCaption){
         AsyncHttpClient httpClient = new AsyncHttpClient();
-        String request_url="http://aptandroiddemo.appspot.com/getUploadURL";
+        String request_url="http://apt2015mini.appspot.com/mgetUploadURL";
         System.out.println(request_url);
         httpClient.get(request_url, new AsyncHttpResponseHandler() {
             String upload_url;
