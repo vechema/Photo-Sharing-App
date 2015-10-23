@@ -1148,8 +1148,12 @@ class mGetUploadURL(webapp2.RequestHandler):
 
 class mUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
     def post(self):
+
         upload = self.get_uploads()[0]
         user_photo = Picture(blob_key=upload.key(), comment=self.request.params['photoCaption'])
+        img_url = get_serving_url(user_photo.blob_key)
+        user_photo.pic_url = img_url
+        # Also need to set longitude and latitude
         user_photo.put()
 
 
