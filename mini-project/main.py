@@ -1153,6 +1153,8 @@ class mUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         user_photo = Picture(blob_key=upload.key(), comment=self.request.params['photoCaption'])
         img_url = get_serving_url(user_photo.blob_key)
         user_photo.pic_url = img_url
+        user_photo.latitude=self.request.params['latitude'];
+        user_photo.longitude=self.request.params['longitude'];
         # Also need to set longitude and latitude
         user_photo.put()
 

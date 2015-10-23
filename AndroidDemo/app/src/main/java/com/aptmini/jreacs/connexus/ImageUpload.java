@@ -1,10 +1,13 @@
 package com.aptmini.jreacs.connexus;
 
+import java.io.IOException;
+
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
@@ -30,6 +33,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Random;
 
 
 public class ImageUpload extends ActionBarActivity {
@@ -76,6 +80,84 @@ public class ImageUpload extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public static int randInt(int min, int max) {
+        Random rand = new Random();
+
+        // nextInt is normally exclusive of the top value,
+        // so add 1 to make it inclusive
+        int randomNum = rand.nextInt((max - min) + 1) + min;
+
+        return randomNum;
+    }
+
+    private float convertToDegree(String stringDMS){
+        float result;
+        String[] DMS = stringDMS.split(",", 3);
+
+        String[] stringD = DMS[0].split("/", 2);
+        Double D0 = new Double(stringD[0]);
+        Double D1 = new Double(stringD[1]);
+        Double FloatD = D0/D1;
+
+        String[] stringM = DMS[1].split("/", 2);
+        Double M0 = new Double(stringM[0]);
+        Double M1 = new Double(stringM[1]);
+        Double FloatM = M0 / M1;
+
+        String[] stringS = DMS[2].split("/", 2);
+        Double S0 = new Double(stringS[0]);
+        Double S1 = new Double(stringS[1]);
+        Double FloatS = S0/S1;
+
+        result = new Float(FloatD + (FloatM/60) + (FloatS/3600));
+
+        return result;
+
+
+    };
+
+    private float[] getLatLong(String file)
+    {
+        float[] result = new float[2];
+        try {
+            ExifInterface exifI = new ExifInterface(file);
+
+            String gps_lat = exifI.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
+            String gps_lat_ref = exifI.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF);
+            String gps_lng = exifI.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
+            String gps_lng_ref =exifI.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF);
+
+            float lat;
+            float lng;
+
+            if(gps_lat_ref.equals("N")){
+                lat = convertToDegree(gps_lat);
+            }
+            else{
+                lat = 0 - convertToDegree(gps_lat);
+            }
+
+            if(gps_lng_ref.equals("E")){
+                lng = convertToDegree(gps_lng);
+            }
+            else{
+                lng = 0 - convertToDegree(gps_lng);
+            }
+
+            result[0] = lat;
+            result[1] = lng;
+
+
+        } catch (IOException e) {
+            //The file couldn't be found
+            int lat = randInt(-90, 90);
+            int lng = randInt(-180, 180);
+            result[0] = lat;
+            result[1] = lng;
+        }
+        return result;
+    }
+
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -91,7 +173,7 @@ public class ImageUpload extends ActionBarActivity {
             // Link to the image
 
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String imageFilePath = cursor.getString(columnIndex);
+            final String imageFilePath = cursor.getString(columnIndex);
             cursor.close();
 
             // Bitmap imaged created and show thumbnail
@@ -121,14 +203,18 @@ public class ImageUpload extends ActionBarActivity {
                             byte[] encodedImage = Base64.encode(b, Base64.DEFAULT);
                             String encodedImageStr = encodedImage.toString();
 
-                            getUploadURL(b, photoCaption);
+                            float[] latlng = getLatLong(imageFilePath);
+                            float lat = latlng[0];
+                            float lng = latlng[1];
+
+                            getUploadURL(b, photoCaption, lat, lng);
                         }
                     }
             );
         }
     }
 
-    private void getUploadURL(final byte[] encodedImage, final String photoCaption){
+    private void getUploadURL(final byte[] encodedImage, final String photoCaption, final float lat, final float lng){
         AsyncHttpClient httpClient = new AsyncHttpClient();
         String request_url="http://apt2015mini.appspot.com/mgetUploadURL";
         System.out.println(request_url);
@@ -141,7 +227,7 @@ public class ImageUpload extends ActionBarActivity {
                     JSONObject jObject = new JSONObject(new String(response));
 
                     upload_url = jObject.getString("upload_url");
-                    postToServer(encodedImage, photoCaption, upload_url);
+                    postToServer(encodedImage, photoCaption, upload_url, lat, lng);
 
                 }
                 catch(JSONException j){
@@ -156,11 +242,13 @@ public class ImageUpload extends ActionBarActivity {
         });
     }
 
-    private void postToServer(byte[] encodedImage,String photoCaption, String upload_url){
+    private void postToServer(byte[] encodedImage,String photoCaption, String upload_url, float lat, float lng){
         System.out.println(upload_url);
         RequestParams params = new RequestParams();
         params.put("file",new ByteArrayInputStream(encodedImage));
         params.put("photoCaption",photoCaption);
+        params.put("latitude", lat);
+        params.put("longitude", lng);
         AsyncHttpClient client = new AsyncHttpClient();
         client.post(upload_url, params, new AsyncHttpResponseHandler() {
             @Override
