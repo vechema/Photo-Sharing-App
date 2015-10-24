@@ -45,6 +45,14 @@
         <activity
             android:name=".ViewAStream"
             android:label="@string/title_activity_view_astream" >
+		</activity>
+        <activity
+            android:name=".TakePhoto"
+            android:label="@string/title_activity_take_photo"
+            android:parentActivityName=".ImageUpload" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.aptmini.jreacs.connexus.ImageUpload" />
         </activity>
     </application>
 
