@@ -1189,6 +1189,54 @@ class mViewAllPhotos(webapp2.RequestHandler):
         self.response.write(jsonObj)
 
 
+class mViewAllStreams(webapp2.RequestHandler):
+    def get(self):
+        stream_query = Stream.query().order(-Stream.creation_date)
+        streams = stream_query.fetch(400)
+        streamList = []
+        coverList = []
+        nameList = []
+
+        for stream in streams:
+            streamList.append(stream);
+
+        for stream in streamList:
+            coverList.append(stream.cover_url)
+            nameList.append(stream.name)
+
+        dictPassed = {
+            'coverURLs' : coverList,
+            'streamNames' : nameList,
+        }
+        jsonObj = json.dumps(dictPassed, sort_keys=True,indent=4, separators=(',', ': '))
+        self.response.write(jsonObj)
+
+
+class mViewAStream(webapp2.RequestHandler):
+    def get(self):
+        stream_name = self.request.get('stream')
+        stream_query = Stream.query(Stream.name == stream_name)
+        streams = stream_query.fetch()
+        stream = streams[0]
+        pics = stream.photos
+
+        picURLList = []
+        picCaptionList = []
+
+        for pic in pics:
+            picURLList.append(pic.pic_url)
+            picCaptionList.append(pic.comment)
+
+
+        dictPassed = {
+            'picUrls': picURLList,
+            'picCaps': picCaptionList,
+        }
+        jsonObj = json.dumps(dictPassed, sort_keys=True,indent=4, separators=(',', ': '))
+        self.response.write(jsonObj)
+
+
+
 app = webapp2.WSGIApplication([
     ('/logincheck', LoginCheckHandler),
     ('/searchrequest', SearchRequestHandler),
@@ -1222,5 +1270,7 @@ app = webapp2.WSGIApplication([
     # below here is all mobile handlers
     ('/mgetUploadURL',mGetUploadURL),
     ('/muploadHandler', mUploadHandler),
-    ('/mviewAllPhotos', mViewAllPhotos)
+    ('/mviewAllPhotos', mViewAllPhotos),
+    ('/mviewAllStreams', mViewAllStreams),
+    ('/mview', mViewAStream),
     ], debug=True)

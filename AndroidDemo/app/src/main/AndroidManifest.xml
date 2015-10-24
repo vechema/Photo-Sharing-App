@@ -39,6 +39,14 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
+            android:name=".DisplayStreams"
+            android:label="@string/title_activity_display_streams" >
+        </activity>
+        <activity
+            android:name=".ViewAStream"
+            android:label="@string/title_activity_view_astream" >
+		</activity>
+        <activity
             android:name=".TakePhoto"
             android:label="@string/title_activity_take_photo"
             android:parentActivityName=".ImageUpload" >
