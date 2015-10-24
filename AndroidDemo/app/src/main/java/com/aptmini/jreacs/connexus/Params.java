@@ -5,4 +5,5 @@ package com.aptmini.jreacs.connexus;
  */
 public class Params {
     public final static int maxStreams = 4;
+    public final static int maxPictures = 4;
 }

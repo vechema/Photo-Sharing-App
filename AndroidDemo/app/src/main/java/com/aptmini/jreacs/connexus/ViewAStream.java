@@ -60,7 +60,7 @@ public class ViewAStream extends ActionBarActivity {
                     JSONArray displayUrls = jObject.getJSONArray("picUrls");
                     JSONArray displayCaps = jObject.getJSONArray("picCaps");
 
-                    for(int i=0;i<displayUrls.length() && i < Params.maxStreams;i++) {
+                    for(int i=0;i<displayUrls.length() && i < Params.maxPictures;i++) {
 
                         picUrls.add(displayUrls.getString(i));
                         picCaps.add(displayCaps.getString(i));
