@@ -80,7 +80,7 @@ public class ImageUpload extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static int randInt(int min, int max) {
+    private static int randInt(int min, int max) {
         Random rand = new Random();
 
         // nextInt is normally exclusive of the top value,
@@ -90,71 +90,44 @@ public class ImageUpload extends ActionBarActivity {
         return randomNum;
     }
 
-    private float convertToDegree(String stringDMS){
-        float result;
-        String[] DMS = stringDMS.split(",", 3);
-
-        String[] stringD = DMS[0].split("/", 2);
-        Double D0 = new Double(stringD[0]);
-        Double D1 = new Double(stringD[1]);
-        Double FloatD = D0/D1;
-
-        String[] stringM = DMS[1].split("/", 2);
-        Double M0 = new Double(stringM[0]);
-        Double M1 = new Double(stringM[1]);
-        Double FloatM = M0 / M1;
-
-        String[] stringS = DMS[2].split("/", 2);
-        Double S0 = new Double(stringS[0]);
-        Double S1 = new Double(stringS[1]);
-        Double FloatS = S0/S1;
-
-        result = new Float(FloatD + (FloatM/60) + (FloatS/3600));
-
+    private static float[] randLatLng()
+    {
+        float[] result = new float[2];
+        int lat = randInt(-90, 90);
+        int lng = randInt(-180, 180);
+        result[0] = lat;
+        result[1] = lng;
         return result;
-
-
-    };
+    }
 
     private float[] getLatLong(String file)
     {
         float[] result = new float[2];
         try {
             ExifInterface exifI = new ExifInterface(file);
+            System.out.println("***EXIFI: "+exifI + "***");
+            String length = exifI.getAttribute(ExifInterface.TAG_IMAGE_LENGTH);
+            String width = exifI.getAttribute(ExifInterface.TAG_IMAGE_WIDTH);
+            System.out.println("Width: " + width + " + Length: " + length);
 
-            String gps_lat = exifI.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
-            String gps_lat_ref = exifI.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF);
-            String gps_lng = exifI.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
-            String gps_lng_ref =exifI.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF);
-
-            float lat;
-            float lng;
-
-            if(gps_lat_ref.equals("N")){
-                lat = convertToDegree(gps_lat);
+            if(exifI.getLatLong(result))
+            {
+                System.out.println("LAT: "+result[0]);
+                System.out.println("LNG: "+result[1]);
+            } else {
+                result = randLatLng();
+                System.out.println("RANDOM FROM ELSE");
             }
-            else{
-                lat = 0 - convertToDegree(gps_lat);
-            }
-
-            if(gps_lng_ref.equals("E")){
-                lng = convertToDegree(gps_lng);
-            }
-            else{
-                lng = 0 - convertToDegree(gps_lng);
-            }
-
-            result[0] = lat;
-            result[1] = lng;
 
 
         } catch (IOException e) {
             //The file couldn't be found
-            int lat = randInt(-90, 90);
-            int lng = randInt(-180, 180);
-            result[0] = lat;
-            result[1] = lng;
+            System.out.println("Something went wrong with finding the picture");
+        } catch (NullPointerException e) {
+            result = randLatLng();
+            System.out.println("~~Something was null, went random!!");
         }
+
         return result;
     }
 

@@ -1165,6 +1165,8 @@ class mViewAllPhotos(webapp2.RequestHandler):
         imageList = []
         imageURLList = []
         imageCaptionList = []
+        imageLatList = []
+        imageLngList = []
         for pic in imageQuery:
             imageList.append(pic)
 
@@ -1174,8 +1176,15 @@ class mViewAllPhotos(webapp2.RequestHandler):
             picURL = images.get_serving_url(pic.blob_key)
             imageURLList.append(picURL)
             imageCaptionList.append(pic.comment)
+            imageLatList.append(pic.latitude)
+            imageLngList.append(pic.longitude)
 
-        dictPassed = {'displayImages':imageURLList, 'imageCaptionList':imageCaptionList}
+        dictPassed = {
+            'displayImages':imageURLList,
+            'imageCaptionList':imageCaptionList,
+            'latitudeList':imageLatList,
+            'longitudeList':imageLngList,
+        }
         jsonObj = json.dumps(dictPassed, sort_keys=True,indent=4, separators=(',', ': '))
         self.response.write(jsonObj)
 
