@@ -49,7 +49,7 @@ class Stream(ndb.Model):
     num_pics = ndb.ComputedProperty(lambda e: len(e.photos))
     view_count = ndb.DateTimeProperty(repeated=True)
     count = ndb.ComputedProperty(lambda e: len(e.view_count))
-
+    owner = ndb.StringProperty()
 
 class Leaders(ndb.Model):
     champs = ndb.KeyProperty(repeated=True)
@@ -606,6 +606,11 @@ class CreateHandler(webapp2.RequestHandler):
         stream.tags = tag_list
         stream.cover_url = cover
 
+        # Add teh owner of the stream
+        user = users.get_current_user()
+        user_email = format_email(user.email())
+        stream.owner = user_email
+
         stream.put()
 
         #Now I need to sign people up by their emails
@@ -627,9 +632,7 @@ class CreateHandler(webapp2.RequestHandler):
                 self.response.write('<br>' +user_sub.email)
                 self.response.write('<br>' +sub_email)
 
-        #Need to set the user as the owner
-        user = users.get_current_user()
-        user_email = format_email(user.email())
+        # Need to set the user as the owner
         userkey = ndb.Key(MyUser, user_email)
 
         if (userkey.get() == None):
@@ -1196,6 +1199,7 @@ class mViewAllStreams(webapp2.RequestHandler):
         streamList = []
         coverList = []
         nameList = []
+        ownerList = []
 
         for stream in streams:
             streamList.append(stream);
@@ -1203,10 +1207,12 @@ class mViewAllStreams(webapp2.RequestHandler):
         for stream in streamList:
             coverList.append(stream.cover_url)
             nameList.append(stream.name)
+            ownerList.append(stream.owner)
 
         dictPassed = {
             'coverURLs' : coverList,
             'streamNames' : nameList,
+            'ownerEmails' : ownerList,
         }
         jsonObj = json.dumps(dictPassed, sort_keys=True,indent=4, separators=(',', ': '))
         self.response.write(jsonObj)

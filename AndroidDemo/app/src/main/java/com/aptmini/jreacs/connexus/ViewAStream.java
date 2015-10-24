@@ -32,6 +32,7 @@ public class ViewAStream extends ActionBarActivity {
     Context context = this;
     private String TAG  = "Display A Stream";
     String stream_name;
+    boolean isOwner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,12 +41,26 @@ public class ViewAStream extends ActionBarActivity {
         setContentView(R.layout.activity_view_astream);
 
         Intent intent = getIntent();
+        String owner_email = intent.getStringExtra(DisplayStreams.OWNER_EMAIL);
+
+        String home_email = formatEmail(Homepage.email);
+
+        if(owner_email.equals(home_email))
+        {
+            System.out.println("I AM THE OWNER!!!!");
+            isOwner = true;
+        } else {
+            isOwner = false;
+        }
+
         stream_name = intent.getStringExtra(DisplayStreams.STREAM_NAME);
         System.out.println("ViewAStream stream name: " + stream_name);
 
         TextView myTextView= (TextView) findViewById(R.id.stream_name_view);
         myTextView.setText(stream_name);
 
+        System.out.println("CURRENT EMAIL: " + Homepage.email);
+        System.out.println("Am I the owner?: " + isOwner);
 
         final String request_url = "http://apt2015mini.appspot.com/mview?stream=" + stream_name;
         AsyncHttpClient httpClient = new AsyncHttpClient();
@@ -98,6 +113,14 @@ public class ViewAStream extends ActionBarActivity {
                 Log.e(TAG, "There was a problem in retrieving the url : " + e.toString());
             }
         });
+    }
+
+    private String formatEmail(String email) {
+        email = email.toLowerCase();
+        //index = email.index('@')
+        int index = email.indexOf('@');
+        //email_front = email[:index]
+        return email.substring(0,index).replace(".","") + email.substring(index);
     }
 
 
