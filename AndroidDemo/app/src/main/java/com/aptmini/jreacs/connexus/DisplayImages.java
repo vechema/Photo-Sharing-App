@@ -42,15 +42,22 @@ public class DisplayImages extends ActionBarActivity {
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
                 final ArrayList<String> imageURLs = new ArrayList<String>();
                 final ArrayList<String> imageCaps = new ArrayList<String>();
+                final ArrayList<String> imageLats = new ArrayList<String>();
+                final ArrayList<String> imageLngs = new ArrayList<String>();
                 try {
                     JSONObject jObject = new JSONObject(new String(response));
                     JSONArray displayImages = jObject.getJSONArray("displayImages");
                     JSONArray displayCaption = jObject.getJSONArray("imageCaptionList");
+                    JSONArray displayLats = jObject.getJSONArray("latitudeList");
+                    JSONArray displayLngs = jObject.getJSONArray("longitudeList");
 
                     for(int i=0;i<displayImages.length();i++) {
 
                         imageURLs.add(displayImages.getString(i));
                         imageCaps.add(displayCaption.getString(i));
+                        imageLats.add(displayLats.getString(i));
+                        imageLngs.add(displayLngs.getString(i));
+
                         System.out.println(displayImages.getString(i));
                     }
                     GridView gridview = (GridView) findViewById(R.id.gridview);
@@ -60,6 +67,7 @@ public class DisplayImages extends ActionBarActivity {
                         public void onItemClick(AdapterView<?> parent, View v,
                                                 int position, long id) {
 
+                            //Toast.makeText(context, imageLats.get(position), Toast.LENGTH_SHORT).show();
                             Toast.makeText(context, imageCaps.get(position), Toast.LENGTH_SHORT).show();
 
                             Dialog imageDialog = new Dialog(context);
