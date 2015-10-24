@@ -33,8 +33,8 @@ class Picture(ndb.Model):
     upload_date = ndb.DateTimeProperty(auto_now_add=True)
     blob_key = ndb.BlobKeyProperty()
     pic_url = ndb.StringProperty()
-    longitude = ndb.IntegerProperty()
-    latitude = ndb.IntegerProperty()
+    longitude = ndb.FloatProperty()
+    latitude = ndb.FloatProperty()
 
 
 class Stream(ndb.Model):
@@ -1153,8 +1153,8 @@ class mUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         user_photo = Picture(blob_key=upload.key(), comment=self.request.params['photoCaption'])
         img_url = get_serving_url(user_photo.blob_key)
         user_photo.pic_url = img_url
-        user_photo.latitude=self.request.params['latitude'];
-        user_photo.longitude=self.request.params['longitude'];
+        user_photo.latitude=float(self.request.params['latitude']);
+        user_photo.longitude=float(self.request.params['longitude']);
         # Also need to set longitude and latitude
         user_photo.put()
 

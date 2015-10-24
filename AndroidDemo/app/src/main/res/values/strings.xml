@@ -10,6 +10,7 @@
     <string name="choose_from_library">Choose From Library</string>
     <string name="title_activity_display_images">DisplayImages</string>
     <string name="imagePage">View All Images</string>
+    <string name="takepicture">Take a Picture</string>
     <string name="uploadImageActivity"> Upload a new image</string>
     <string name="title_activity_image_upload">ImageUpload</string>
 

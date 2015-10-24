@@ -220,6 +220,7 @@ public class ImageUpload extends ActionBarActivity {
         System.out.println(request_url);
         httpClient.get(request_url, new AsyncHttpResponseHandler() {
             String upload_url;
+
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
 
@@ -229,8 +230,7 @@ public class ImageUpload extends ActionBarActivity {
                     upload_url = jObject.getString("upload_url");
                     postToServer(encodedImage, photoCaption, upload_url, lat, lng);
 
-                }
-                catch(JSONException j){
+                } catch (JSONException j) {
                     System.out.println("JSON Error");
                 }
             }
@@ -256,14 +256,21 @@ public class ImageUpload extends ActionBarActivity {
                 Log.w("async", "success!!!!");
                 Toast.makeText(context, "Upload Successful", Toast.LENGTH_SHORT).show();
             }
+
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                Log.e("Posting_to_blob","There was a problem in retrieving the url : " + e.toString());
+                Log.e("Posting_to_blob", "There was a problem in retrieving the url : " + e.toString());
             }
         });
     }
 
     public void viewAllImages(View view){
+        Intent intent= new Intent(this, DisplayImages.class);
+
+        startActivity(intent);
+    }
+
+    public void takePicture(View view){
         Intent intent= new Intent(this, DisplayImages.class);
 
         startActivity(intent);
