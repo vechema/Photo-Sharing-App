@@ -29,10 +29,15 @@ import java.util.ArrayList;
 
 public class ViewAStream extends ActionBarActivity {
 
+    public final static String PIC_NUM = "com.aptmini.jreacs.connexus.PIC_NUM";
+    public final static String OWNER_EMAIL = "com.aptmini.jreacs.connexus.OWNER_EMAIL";
+    public final static String STREAM_NAME = "com.aptmini.jreacs.connexus.STREAM_NAME";
     Context context = this;
     private String TAG  = "Display A Stream";
     String stream_name;
     boolean isOwner;
+    String owners_email;
+    int picNum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +45,24 @@ public class ViewAStream extends ActionBarActivity {
 
         setContentView(R.layout.activity_view_astream);
 
+        TextView morePicsText= (TextView) findViewById(R.id.view_more_pics_astream);
+        morePicsText.setVisibility(View.VISIBLE);
+
+        //Get what page we're on
         Intent intent = getIntent();
+        String pic_num = intent.getStringExtra(ViewNearbyPics.PIC_NUM);
+        System.out.println("Intent pic_num: " + pic_num);
+        try {
+            picNum = Integer.parseInt(pic_num);
+            System.out.println("PICNUM WAS PARSED");
+        } catch (NumberFormatException e) {
+            System.out.println("NUMBER FORMAT EXCEPTION");
+            picNum = 0;
+        }
+
+        //Owner stuff
         String owner_email = intent.getStringExtra(DisplayStreams.OWNER_EMAIL);
+        owners_email = owner_email;
 
         String home_email = null;
         if (Homepage.email != null) {
@@ -55,8 +76,6 @@ public class ViewAStream extends ActionBarActivity {
         } else {
             isOwner = false;
         }
-
-
 
         stream_name = intent.getStringExtra(DisplayStreams.STREAM_NAME);
         System.out.println("ViewAStream stream name: " + stream_name);
@@ -80,7 +99,15 @@ public class ViewAStream extends ActionBarActivity {
                     JSONArray displayUrls = jObject.getJSONArray("picUrls");
                     JSONArray displayCaps = jObject.getJSONArray("picCaps");
 
-                    for(int i=0;i<displayUrls.length() && i < Params.maxPictures;i++) {
+                    //Make the More Pics button disappear if displayUrls.length < picNum + Params.maxPictures
+                    if(displayUrls.length() <= picNum + Params.maxPictures)
+                    {
+                        System.out.println("NOT ENOUGH PICTURES FOR MORE!!!");
+                        TextView myTextView= (TextView) findViewById(R.id.view_more_pics_astream);
+                        myTextView.setVisibility(View.INVISIBLE);
+                    }
+
+                    for(int i=picNum;i<displayUrls.length() && i < Params.maxPictures+picNum;i++) {
 
                         picUrls.add(displayUrls.getString(i));
                         picCaps.add(displayCaps.getString(i));
@@ -150,6 +177,17 @@ public class ViewAStream extends ActionBarActivity {
 
     public void viewAllStreams(View view) {
         Intent intent = new Intent(this, DisplayStreams.class);
+        startActivity(intent);
+    }
+
+    public void viewMorePics(View view) {
+        Intent intent = new Intent(this, ViewAStream.class);
+        System.out.println("INTENT TO START NEARBY AGAIN, picNum: " + picNum);
+        String toPass = ""+(picNum+Params.maxPictures);
+        System.out.println("\tWHAT I'M PASSSINGGG: " + toPass);
+        intent.putExtra(PIC_NUM, toPass);
+        intent.putExtra(OWNER_EMAIL, owners_email);
+        intent.putExtra(STREAM_NAME, stream_name);
         startActivity(intent);
     }
 

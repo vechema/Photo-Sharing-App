@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -23,13 +24,32 @@ public class ViewNearbyPics extends ActionBarActivity {
 
     public final static String STREAM_NAME = "com.aptmini.jreacs.connexus.STREAM_NAME";
     public final static String OWNER_EMAIL = "com.aptmini.jreacs.connexus.OWNER_EMAIL";
+    public final static String PIC_NUM = "com.aptmini.jreacs.connexus.PIC_NUM";
     Context context = this;
     private String TAG  = "Display Nearby Pics";
+    int picNum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_nearby_pics);
+
+        TextView myTextView= (TextView) findViewById(R.id.view_more_pics_nearby);
+        myTextView.setVisibility(View.VISIBLE);
+
+        //Get what page we're on
+        Intent intent = getIntent();
+        String pic_num = intent.getStringExtra(ViewNearbyPics.PIC_NUM);
+        System.out.println("Intent pic_num: " + pic_num);
+        try {
+            picNum = Integer.parseInt(pic_num);
+            System.out.println("PICNUM WAS PARSED");
+        } catch (NumberFormatException e) {
+            System.out.println("NUMBER FORMAT EXCEPTION");
+            picNum = 0;
+        }
+
+        System.out.println("**Picture number we're on: " + picNum);
 
         final String request_url = "http://apt2015mini.appspot.com/mviewNearby?latitude=" + Params.latitude + "&longitude=" +Params.longitude;
         AsyncHttpClient httpClient = new AsyncHttpClient();
@@ -48,12 +68,20 @@ public class ViewNearbyPics extends ActionBarActivity {
                     JSONArray displayOwner = jObject.getJSONArray("ownerEmails");
                     JSONArray displayDists = jObject.getJSONArray("distances");
 
-                    for (int i = 0; i < displayNames.length() && i < Params.maxPictures; i++) {
+                    //Make the More Pics button disappear if displayUrls.length < picNum + Params.maxPictures
+                    if(displayUrls.length() <= picNum + Params.maxPictures)
+                    {
+                        System.out.println("NOT ENOUGH PICTURES FOR MORE!!!");
+                        TextView myTextView= (TextView) findViewById(R.id.view_more_pics_nearby);
+                        myTextView.setVisibility(View.INVISIBLE);
+                    }
+
+                    for (int i = picNum; i < displayNames.length() && i < Params.maxPictures+picNum; i++) {
 
                         picURLs.add(displayUrls.getString(i));
                         streamNames.add(displayNames.getString(i));
                         ownerEmails.add(displayOwner.getString(i));
-                        distances.add(displayDists.getString(i));
+                        distances.add(displayDists.getString(i).substring(0,displayDists.getString(i).indexOf('.')) + " km");
 
                         System.out.println(displayNames.getString(i));
                     }
@@ -101,6 +129,15 @@ public class ViewNearbyPics extends ActionBarActivity {
 
     public void viewAllStreams(View view) {
         Intent intent = new Intent(this, DisplayStreams.class);
+        startActivity(intent);
+    }
+
+    public void viewMorePics(View view) {
+        Intent intent = new Intent(this, ViewNearbyPics.class);
+        System.out.println("INTENT TO START NEARBY AGAIN, picNum: " + picNum);
+        String toPass = ""+(picNum+Params.maxPictures);
+        System.out.println("\tWHAT I'M PASSSINGGG: " + toPass);
+        intent.putExtra(PIC_NUM, toPass);
         startActivity(intent);
     }
 

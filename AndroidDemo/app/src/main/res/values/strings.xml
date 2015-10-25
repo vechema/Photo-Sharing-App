@@ -18,7 +18,8 @@
     <string name="allStreams">Connexus! - All Streams</string>
     <string name="nothing">Nothing</string>
     <string name="viewNearby">View nearby</string>
-    <string name="nearbyPics">NearbyPics</string>
+    <string name="nearbyPics">Nearby Pics</string>
+    <string name="morePics">More Pics</string>
 
 
     <string name="circles_title">Visible circles:</string>
