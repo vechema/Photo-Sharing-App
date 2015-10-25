@@ -30,6 +30,7 @@ public class DisplayStreams extends ActionBarActivity {
     Context context = this;
     private String TAG  = "Display All Streams";
     public final static String STREAM_NAME = "com.aptmini.jreacs.connexus.STREAM_NAME";
+    public final static String OWNER_EMAIL = "com.aptmini.jreacs.connexus.OWNER_EMAIL";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,16 +44,19 @@ public class DisplayStreams extends ActionBarActivity {
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
                 final ArrayList<String> coverURLs = new ArrayList<String>();
                 final ArrayList<String> streamNames = new ArrayList<String>();
+                final ArrayList<String> ownerEmails = new ArrayList<String>();
                 try {
                     JSONObject jObject = new JSONObject(new String(response));
 
                     JSONArray displayUrls = jObject.getJSONArray("coverURLs");
                     JSONArray displayNames = jObject.getJSONArray("streamNames");
+                    JSONArray displayOwner = jObject.getJSONArray("ownerEmails");
 
                     for(int i=0;i<displayNames.length() && i < Params.maxStreams;i++) {
 
                         coverURLs.add(displayUrls.getString(i));
                         streamNames.add(displayNames.getString(i));
+                        ownerEmails.add(displayOwner.getString(i));
 
                         System.out.println(displayNames.getString(i));
                     }
@@ -66,8 +70,10 @@ public class DisplayStreams extends ActionBarActivity {
                             //When clicked - open up a new activity - view a single stream
                             Intent intent = new Intent(context, ViewAStream.class);
                             String stream_name = streamNames.get(position);
+                            String owner_email = ownerEmails.get(position);
                             System.out.println("DisplayStreams, stream name: " + stream_name);
                             intent.putExtra(STREAM_NAME, stream_name);
+                            intent.putExtra(OWNER_EMAIL, owner_email);
                             startActivity(intent);
 
                             /*Toast.makeText(context, streamNames.get(position), Toast.LENGTH_SHORT).show();
