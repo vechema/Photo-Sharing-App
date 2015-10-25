@@ -64,6 +64,22 @@ public class Test extends ActionBarActivity {
         );
     }
 
+    //Calls release camera when the app is done using it.
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //releaseMediaRecorder();       // if you are using MediaRecorder, release it first
+        releaseCamera();              // release the camera immediately on pause event
+    }
+
+    //releases the camera
+    private void releaseCamera(){
+        if (mCamera != null){
+            mCamera.release();        // release the camera for other applications
+            mCamera = null;
+        }
+    }
+
     /**
      * A safe way to get an instance of the Camera object.
      */
