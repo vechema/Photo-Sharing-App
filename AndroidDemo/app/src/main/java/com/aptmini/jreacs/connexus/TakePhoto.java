@@ -1,201 +1,244 @@
 package com.aptmini.jreacs.connexus;
 
-import android.content.Context;
+import android.app.Activity;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
+import android.content.Context;
+import android.util.Log;
+import android.view.SurfaceView;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+
 
 public class TakePhoto extends ActionBarActivity {
 
     Camera mCamera;
-    Preview mPreview;
+    int numberOfCameras;
+    int cameraCurrentlyLocked;
+    int defaultCameraId;
+    private static final String TAG = "takephoto-login";
+    public static final int MEDIA_TYPE_IMAGE = 1;
+    public static final int MEDIA_TYPE_VIDEO = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPreview = new Preview(this);
-        setContentView(mPreview);
-        //setContentView(R.layout.activity_take_photo);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        safeCameraOpen(0);
+        setContentView(R.layout.activity_test);
+
+        //create camera object
+        final Camera myCamera = getCameraInstance();
+
+        //correct the camera's orientation
+        setCameraDisplayOrientation(this, 0, myCamera);
+
+        //create the camera preview and add it to the xml layout,
+        CameraPreview myPreview = new CameraPreview(this,myCamera);
+        FrameLayout frame = (FrameLayout) findViewById(R.id.camera_preview);
+        frame.removeAllViews();
+        frame.addView(myPreview);
+
+        // Add a listener to the Capture button
+        Button captureButton = (Button) findViewById(R.id.button_capture);
+        captureButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // get an image from the camera
+                        myCamera.takePicture(null, null, mPicture);
+                    }
+                }
+        );
     }
 
-
-    private boolean safeCameraOpen(int id) {
-        boolean qOpened = false;
-
-        try {
-            releaseCameraAndPreview();
-            mCamera = Camera.open();
-            qOpened = (mCamera != null);
-            mPreview.setCamera(mCamera);
-        } catch (Exception e) {
-            Log.e(getString(R.string.app_name), "failed to open Camera");
-            e.printStackTrace();
-        }
-
-        return qOpened;
+    //Calls release camera when the app is done using it.
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //releaseMediaRecorder();       // if you are using MediaRecorder, release it first
+        releaseCamera();              // release the camera immediately on pause event
     }
 
-    private void releaseCameraAndPreview() {
-        mPreview.setCamera(null);
-        if (mCamera != null) {
-            mCamera.release();
+    //releases the camera
+    private void releaseCamera(){
+        if (mCamera != null){
+            mCamera.release();        // release the camera for other applications
             mCamera = null;
         }
     }
 
-    class Preview extends ViewGroup implements SurfaceHolder.Callback {
+    /**
+     * A safe way to get an instance of the Camera object.
+     */
+    public static Camera getCameraInstance() {
+        Camera c = null;
+        try {
+            c = Camera.open(); // attempt to get a Camera instance
+        } catch (Exception e) {
+            // Camera is not available (in use or does not exist)
+        }
+        return c; // returns null if camera is unavailable
+    }
 
-        SurfaceView mSurfaceView;
-        SurfaceHolder mHolder;
-        Camera.Size mPreviewSize;
-        List<Camera.Size> mSupportedPreviewSizes;
-        Camera mCamera;
+    /**
+     * A basic Camera preview class
+     */
+    public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
+        private SurfaceHolder mHolder;
+        private Camera mCamera;
 
-        Preview(Context context) {
+        public CameraPreview(Context context, Camera camera) {
             super(context);
-
-            mSurfaceView = new SurfaceView(context);
-            addView(mSurfaceView);
+            mCamera = camera;
 
             // Install a SurfaceHolder.Callback so we get notified when the
             // underlying surface is created and destroyed.
-            mHolder = mSurfaceView.getHolder();
+            mHolder = getHolder();
             mHolder.addCallback(this);
+            // deprecated setting, but required on Android versions prior to 3.0
             mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         }
 
-        public void setCamera(Camera camera) {
-            if (mCamera == camera) { return; }
-
-            stopPreviewAndFreeCamera();
-
-            mCamera = camera;
-
-            if (mCamera != null) {
-                List<Camera.Size> localSizes = mCamera.getParameters().getSupportedPreviewSizes();
-                mSupportedPreviewSizes = localSizes;
-                requestLayout();
-
-                try {
-                    mCamera.setPreviewDisplay(mHolder);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                // Important: Call startPreview() to start updating the preview
-                // surface. Preview must be started before you can take a picture.
-                mCamera.startPreview();
-            }
-        }
-
-        public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-            // Now that the size is known, set up the camera parameters and begin
-            // the preview.
-            Camera.Parameters parameters = mCamera.getParameters();
-            parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
-            requestLayout();
-            mCamera.setParameters(parameters);
-
-            // Important: Call startPreview() to start updating the preview surface.
-            // Preview must be started before you can take a picture.
-            mCamera.startPreview();
-        }
-
-//        @Override
-//        public void onClick(View v) {
-//            switch(mPreviewState) {
-//                case K_STATE_FROZEN:
-//                    mCamera.startPreview();
-//                    mPreviewState = K_STATE_PREVIEW;
-//                    break;
-//
-//                default:
-//                    mCamera.takePicture( null, rawCallback, null);
-//                    mPreviewState = K_STATE_BUSY;
-//            } // switch
-//            shutterBtnConfig();
-//        }
-
         public void surfaceCreated(SurfaceHolder holder) {
-            // The Surface has been created, acquire the camera and tell it where
-            // to draw.
+            // The Surface has been created, now tell the camera where to draw the preview.
             try {
-                if (mCamera != null) {
-                    mCamera.setPreviewDisplay(holder);
-                }
-            } catch (IOException exception) {
-                Log.e(getString(R.string.app_name), "IOException caused by setPreviewDisplay()");
+                mCamera.setPreviewDisplay(holder);
+                mCamera.startPreview();
+            } catch (IOException e) {
+                Log.d(TAG, "Error setting camera preview: " + e.getMessage());
             }
         }
 
         public void surfaceDestroyed(SurfaceHolder holder) {
-            // Surface will be destroyed when we return, so stop the preview.
-            if (mCamera != null) {
-                // Call stopPreview() to stop updating the preview surface.
-                mCamera.stopPreview();
-            }
+            // empty. Take care of releasing the Camera preview in your activity.
         }
 
-        /**
-         * When this function returns, mCamera will be null.
-         */
-        private void stopPreviewAndFreeCamera() {
+        public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+            // If your preview can change or rotate, take care of those events here.
+            // Make sure to stop the preview before resizing or reformatting it.
 
-            if (mCamera != null) {
-                // Call stopPreview() to stop updating the preview surface.
+            if (mHolder.getSurface() == null) {
+                // preview surface does not exist
+                return;
+            }
+
+            // stop preview before making changes
+            try {
                 mCamera.stopPreview();
+            } catch (Exception e) {
+                // ignore: tried to stop a non-existent preview
+            }
 
-                // Important: Call release() to release the camera for use by other
-                // applications. Applications should release the camera immediately
-                // during onPause() and re-open() it during onResume()).
-                mCamera.release();
+            // set preview size and make any resize, rotate or
+            // reformatting changes here
 
-                mCamera = null;
+            // start preview with new settings
+            try {
+                mCamera.setPreviewDisplay(mHolder);
+                mCamera.startPreview();
+
+            } catch (Exception e) {
+                Log.d(TAG, "Error starting camera preview: " + e.getMessage());
             }
         }
+    }
 
-        //Double check this onLayout code
+
+    //Set the camera orientation to be the same as the display
+    public static void setCameraDisplayOrientation(Activity activity, int cameraId, android.hardware.Camera camera) {
+        android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+        android.hardware.Camera.getCameraInfo(cameraId, info);
+        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0: degrees = 0; break;
+            case Surface.ROTATION_90: degrees = 90; break;
+            case Surface.ROTATION_180: degrees = 180; break;
+            case Surface.ROTATION_270: degrees = 270; break;
+        }
+
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+        camera.setDisplayOrientation(result);
+    }
+
+    //recieve the image data and write it to a file
+    private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
 
         @Override
-        protected void onLayout(boolean changed, int l, int t, int r, int b) {
-            if (changed && getChildCount() > 0) {
-                final View child = getChildAt(0);
+        public void onPictureTaken(byte[] data, Camera camera) {
 
-                final int width = r - l;
-                final int height = b - t;
+            File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+            if (pictureFile == null){
+                Log.d(TAG, "Error creating media file, check storage permissions");
+                return;
+            }
 
-                int previewWidth = width;
-                int previewHeight = height;
-                if (mPreviewSize != null) {
-                    previewWidth = mPreviewSize.width;
-                    previewHeight = mPreviewSize.height;
-                }
+            try {
+                FileOutputStream fos = new FileOutputStream(pictureFile);
+                fos.write(data);
+                fos.close();
+            } catch (FileNotFoundException e) {
+                Log.d(TAG, "File not found: " + e.getMessage());
+            } catch (IOException e) {
+                Log.d(TAG, "Error accessing file: " + e.getMessage());
+            }
+        }
+    };
 
-                // Center the child SurfaceView within the parent.
-                if (width * previewHeight > height * previewWidth) {
-                    final int scaledChildWidth = previewWidth * height / previewHeight;
-                    child.layout((width - scaledChildWidth) / 2, 0,
-                            (width + scaledChildWidth) / 2, height);
-                } else {
-                    final int scaledChildHeight = previewHeight * width / previewWidth;
-                    child.layout(0, (height - scaledChildHeight) / 2,
-                            width, (height + scaledChildHeight) / 2);
-                }
+    /** Create a File for saving an image or video */
+    private static File getOutputMediaFile(int type){
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "MyCameraApp");
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        // Create the storage directory if it does not exist
+        if (! mediaStorageDir.exists()){
+            if (! mediaStorageDir.mkdirs()){
+                Log.d("MyCameraApp", "failed to create directory");
+                return null;
             }
         }
 
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile;
+        if (type == MEDIA_TYPE_IMAGE){
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    "IMG_"+ timeStamp + ".jpg");
+        } else if(type == MEDIA_TYPE_VIDEO) {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    "VID_"+ timeStamp + ".mp4");
+        } else {
+            return null;
+        }
+
+        return mediaFile;
     }
 
 
 
 }
+
