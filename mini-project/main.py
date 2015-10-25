@@ -1208,6 +1208,8 @@ class mViewAllStreams(webapp2.RequestHandler):
         for stream in streams:
             streamList.append(stream);
 
+        streamList = sorted(streamList, key=lambda k: k.upload_date,reverse = True)
+
         for stream in streamList:
             coverList.append(stream.cover_url)
             nameList.append(stream.name)

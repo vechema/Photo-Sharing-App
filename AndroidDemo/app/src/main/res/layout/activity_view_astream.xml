@@ -9,7 +9,6 @@
 
     <TextView
         android:id="@+id/stream_name_view"
-
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -27,6 +26,13 @@
         android:horizontalSpacing="10dp"
         android:stretchMode="columnWidth"
         android:gravity="center"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/morePics"
+        android:id="@+id/view_more_pics_astream"
+        android:onClick="viewMorePics"
         />
     <Button
         android:layout_width="match_parent"
