@@ -17,6 +17,8 @@
     <string name="viewAllStreamsActivity">View Streams</string>
     <string name="allStreams">Connexus! - All Streams</string>
     <string name="nothing">Nothing</string>
+    <string name="viewNearby">View nearby</string>
+    <string name="nearbyPics">NearbyPics</string>
 
 
     <string name="circles_title">Visible circles:</string>
@@ -46,6 +48,7 @@
 
     <string name="title_activity_take_photo">TakePhoto</string>
     <string name="title_activity_test">Test</string>
+    <string name="title_activity_view_nearby_pics">ViewNearbyPics</string>
 
 
 

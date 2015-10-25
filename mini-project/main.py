@@ -8,6 +8,7 @@ import re
 import json
 import random
 import time
+import math
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -35,6 +36,8 @@ class Picture(ndb.Model):
     pic_url = ndb.StringProperty()
     longitude = ndb.FloatProperty()
     latitude = ndb.FloatProperty()
+    distance = ndb.FloatProperty()
+    stream_name = ndb.StringProperty()
 
 
 class Stream(ndb.Model):
@@ -518,6 +521,7 @@ class PhotoUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         # Add random latitude and longitude to a photo
         user_photo.latitude = random.randint(-90,90)
         user_photo.longitude = random.randint(-180,180)
+        user_photo.stream_name = stream_name
         #user_photo.latitude = 0
         #user_photo.longitude = 0
         user_photo.put()
@@ -1242,6 +1246,60 @@ class mViewAStream(webapp2.RequestHandler):
         self.response.write(jsonObj)
 
 
+class mViewNearby (webapp2.RequestHandler):
+    def get(self):
+        # give the latitude and longitude, need to return nearby photos
+        lat = self.request.get('latitude')
+        lng = self.request.get('longitude')
+
+        distances = []
+        picUrls = []
+        streamNames = []
+        ownerEmails = []
+
+        # All the pics, need to put them in order
+        imageQuery = Picture.query()
+        imageList = []
+        for pic in imageQuery:
+            pic.distance = calcDist(lat,lng, pic.latitude, pic.longitude)
+            pic.put()
+            imageList.append(pic)
+
+        imageList = sorted(imageList, key=lambda k: k.distance,reverse = False)
+
+        for pic in imageList:
+            distances.append(pic.distance)
+            picUrls.append(pic.pic_url)
+            streamNames.append(pic.stream_name)
+
+            #Getting the email...
+            stream_query = Stream.query(Stream.name == pic.stream_name)
+            streams = stream_query.fetch()
+            stream = streams[0]
+            ownerEmails.append(stream.owner)
+
+        dictPassed = {
+            'distances' : distances,
+            'picUrls' : picUrls,
+            'streamNames' : streamNames,
+            'ownerEmails' : ownerEmails,
+        }
+        jsonObj = json.dumps(dictPassed, sort_keys=True,indent=4, separators=(',', ': '))
+        self.response.write(jsonObj)
+
+def calcDist(latit1, long1, latit2, long2):
+    lat1 = math.radians(float(latit1))
+    lon1 = math.radians(float(long1))
+    lat2 = math.radians(float(latit2))
+    lon2 = math.radians(float(long2))
+    R = 6373
+
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = (math.sin(dlat/2))**2 + math.cos(lat1) * math.cos(lat2) * (math.sin(dlon/2))**2
+    c = 2 * math.atan2( math.sqrt(a), math.sqrt(1-a) )
+    d = R * c #(where R is the radius of the Earth)
+    return d
 
 app = webapp2.WSGIApplication([
     ('/logincheck', LoginCheckHandler),
@@ -1279,4 +1337,5 @@ app = webapp2.WSGIApplication([
     ('/mviewAllPhotos', mViewAllPhotos),
     ('/mviewAllStreams', mViewAllStreams),
     ('/mview', mViewAStream),
+    ('/mviewNearby', mViewNearby),
     ], debug=True)

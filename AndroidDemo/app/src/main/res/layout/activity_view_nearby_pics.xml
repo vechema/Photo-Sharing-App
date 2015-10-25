@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.aptmini.jreacs.connexus.DisplayStreams">
+    tools:context="com.aptmini.jreacs.connexus.ViewNearbyPics">
 
     <TextView
-        android:text="@string/allStreams"
+        android:text="@string/nearbyPics"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -17,7 +17,7 @@
         />
 
     <GridView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/gridview_streams"
+        android:id="@+id/gridview_nearby"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:columnWidth="90dp"
@@ -30,8 +30,8 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/viewNearby"
-        android:id="@+id/view_nearby"
-        android:onClick="viewNearbyPics"
+        android:text="@string/viewAllStreamsActivity"
+        android:id="@+id/view_all_streams"
+        android:onClick="viewAllStreams"
         />
 </LinearLayout>
