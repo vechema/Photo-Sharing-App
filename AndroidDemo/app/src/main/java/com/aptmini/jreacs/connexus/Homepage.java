@@ -399,4 +399,10 @@ public class Homepage extends ActionBarActivity implements
         startActivity(intent);
     }
 
+    public void Testing(View view){
+        Intent intent= new Intent(this, Test.class);
+
+        startActivity(intent);
+    }
+
 }
