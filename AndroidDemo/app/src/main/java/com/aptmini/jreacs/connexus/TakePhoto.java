@@ -1,59 +1,65 @@
 package com.aptmini.jreacs.connexus;
 
-import android.content.Context;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
+import android.content.Context;
+import android.util.Log;
+import android.view.SurfaceView;
 import android.view.ViewGroup;
-
 import java.io.IOException;
 import java.util.List;
 
+
 public class TakePhoto extends ActionBarActivity {
 
+    private Preview mPreview;
     Camera mCamera;
-    Preview mPreview;
+    int numberOfCameras;
+    int cameraCurrentlyLocked;
+    int defaultCameraId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreview = new Preview(this);
         setContentView(mPreview);
-        //setContentView(R.layout.activity_take_photo);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        safeCameraOpen(0);
+
+        mPreview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCamera.autoFocus(null);
+            }
+        });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
 
-    private boolean safeCameraOpen(int id) {
-        boolean qOpened = false;
-
-        try {
-            releaseCameraAndPreview();
-            mCamera = Camera.open();
-            qOpened = (mCamera != null);
-            mPreview.setCamera(mCamera);
-        } catch (Exception e) {
-            Log.e(getString(R.string.app_name), "failed to open Camera");
-            e.printStackTrace();
-        }
-
-        return qOpened;
-    }
-
-    private void releaseCameraAndPreview() {
-        mPreview.setCamera(null);
+        // Because the Camera object is a shared resource, it's very
+        // important to release it when the activity is paused.
         if (mCamera != null) {
+            mPreview.setCamera(null);
             mCamera.release();
             mCamera = null;
         }
     }
 
-    class Preview extends ViewGroup implements SurfaceHolder.Callback {
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Open the default i.e. the first rear facing camera.
+        mCamera = Camera.open();
+        cameraCurrentlyLocked = defaultCameraId;
+        mPreview.setCamera(mCamera);
+    }
+
+    public class Preview extends ViewGroup implements SurfaceHolder.Callback {
+        private final String TAG = "Preview";
 
         SurfaceView mSurfaceView;
         SurfaceHolder mHolder;
@@ -61,7 +67,8 @@ public class TakePhoto extends ActionBarActivity {
         List<Camera.Size> mSupportedPreviewSizes;
         Camera mCamera;
 
-        Preview(Context context) {
+
+        public Preview(Context context) {
             super(context);
 
             mSurfaceView = new SurfaceView(context);
@@ -75,96 +82,41 @@ public class TakePhoto extends ActionBarActivity {
         }
 
         public void setCamera(Camera camera) {
-            if (mCamera == camera) { return; }
-
-            stopPreviewAndFreeCamera();
-
             mCamera = camera;
-
             if (mCamera != null) {
-                List<Camera.Size> localSizes = mCamera.getParameters().getSupportedPreviewSizes();
-                mSupportedPreviewSizes = localSizes;
+                mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
                 requestLayout();
-
-                try {
-                    mCamera.setPreviewDisplay(mHolder);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                // Important: Call startPreview() to start updating the preview
-                // surface. Preview must be started before you can take a picture.
-                mCamera.startPreview();
             }
         }
 
-        public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-            // Now that the size is known, set up the camera parameters and begin
-            // the preview.
-            Camera.Parameters parameters = mCamera.getParameters();
+        public void switchCamera(Camera camera) {
+            setCamera(camera);
+            try {
+                camera.setPreviewDisplay(mHolder);
+            } catch (IOException exception) {
+                Log.e(TAG, "IOException caused by setPreviewDisplay()", exception);
+            }
+
+            Camera.Parameters parameters = camera.getParameters();
             parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
             requestLayout();
-            mCamera.setParameters(parameters);
 
-            // Important: Call startPreview() to start updating the preview surface.
-            // Preview must be started before you can take a picture.
-            mCamera.startPreview();
+            camera.setParameters(parameters);
         }
 
-//        @Override
-//        public void onClick(View v) {
-//            switch(mPreviewState) {
-//                case K_STATE_FROZEN:
-//                    mCamera.startPreview();
-//                    mPreviewState = K_STATE_PREVIEW;
-//                    break;
-//
-//                default:
-//                    mCamera.takePicture( null, rawCallback, null);
-//                    mPreviewState = K_STATE_BUSY;
-//            } // switch
-//            shutterBtnConfig();
-//        }
+        @Override
+        protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+            // We purposely disregard child measurements because act as a
+            // wrapper to a SurfaceView that centers the camera preview instead
+            // of stretching it.
+            final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+            final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
+            setMeasuredDimension(width, height);
 
-        public void surfaceCreated(SurfaceHolder holder) {
-            // The Surface has been created, acquire the camera and tell it where
-            // to draw.
-            try {
-                if (mCamera != null) {
-                    mCamera.setPreviewDisplay(holder);
-                }
-            } catch (IOException exception) {
-                Log.e(getString(R.string.app_name), "IOException caused by setPreviewDisplay()");
+            if (mSupportedPreviewSizes != null) {
+                mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, width, height);
             }
         }
-
-        public void surfaceDestroyed(SurfaceHolder holder) {
-            // Surface will be destroyed when we return, so stop the preview.
-            if (mCamera != null) {
-                // Call stopPreview() to stop updating the preview surface.
-                mCamera.stopPreview();
-            }
-        }
-
-        /**
-         * When this function returns, mCamera will be null.
-         */
-        private void stopPreviewAndFreeCamera() {
-
-            if (mCamera != null) {
-                // Call stopPreview() to stop updating the preview surface.
-                mCamera.stopPreview();
-
-                // Important: Call release() to release the camera for use by other
-                // applications. Applications should release the camera immediately
-                // during onPause() and re-open() it during onResume()).
-                mCamera.release();
-
-                mCamera = null;
-            }
-        }
-
-        //Double check this onLayout code
 
         @Override
         protected void onLayout(boolean changed, int l, int t, int r, int b) {
@@ -194,8 +146,72 @@ public class TakePhoto extends ActionBarActivity {
             }
         }
 
+        public void surfaceCreated(SurfaceHolder holder) {
+            // The Surface has been created, acquire the camera and tell it where
+            // to draw.
+            try {
+                if (mCamera != null) {
+                    mCamera.setPreviewDisplay(holder);
+                }
+            } catch (IOException exception) {
+                Log.e(TAG, "IOException caused by setPreviewDisplay()", exception);
+            }
+        }
+
+        public void surfaceDestroyed(SurfaceHolder holder) {
+            // Surface will be destroyed when we return, so stop the preview.
+            if (mCamera != null) {
+                mCamera.stopPreview();
+            }
+        }
+
+
+        private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
+            final double ASPECT_TOLERANCE = 0.1;
+            double targetRatio = (double) w / h;
+            if (sizes == null) return null;
+
+            Camera.Size optimalSize = null;
+            double minDiff = Double.MAX_VALUE;
+
+            int targetHeight = h;
+
+            // Try to find an size match aspect ratio and size
+            for (Camera.Size size : sizes) {
+                double ratio = (double) size.width / size.height;
+                if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+                if (Math.abs(size.height - targetHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.height - targetHeight);
+                }
+            }
+
+            // Cannot find the one match the aspect ratio, ignore the requirement
+            if (optimalSize == null) {
+                minDiff = Double.MAX_VALUE;
+                for (Camera.Size size : sizes) {
+                    if (Math.abs(size.height - targetHeight) < minDiff) {
+                        optimalSize = size;
+                        minDiff = Math.abs(size.height - targetHeight);
+                    }
+                }
+            }
+            return optimalSize;
+        }
+
+        public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+            // Now that the size is known, set up the camera parameters and begin
+            // the preview.
+            if(mCamera != null){
+                Camera.Parameters parameters = mCamera.getParameters();
+                parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+                requestLayout();
+
+                mCamera.setParameters(parameters);
+                mCamera.startPreview();
+            }
+        }
+
     }
-
-
 
 }
