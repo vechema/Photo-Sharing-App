@@ -43,7 +43,10 @@ public class ViewAStream extends ActionBarActivity {
         Intent intent = getIntent();
         String owner_email = intent.getStringExtra(DisplayStreams.OWNER_EMAIL);
 
-        String home_email = formatEmail(Homepage.email);
+        String home_email = null;
+        if (Homepage.email != null) {
+            home_email = formatEmail(Homepage.email);
+        }
 
         if(owner_email.equals(home_email))
         {
@@ -52,6 +55,8 @@ public class ViewAStream extends ActionBarActivity {
         } else {
             isOwner = false;
         }
+
+
 
         stream_name = intent.getStringExtra(DisplayStreams.STREAM_NAME);
         System.out.println("ViewAStream stream name: " + stream_name);

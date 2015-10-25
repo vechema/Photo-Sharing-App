@@ -1,25 +1,16 @@
 package com.aptmini.jreacs.connexus;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.squareup.picasso.Picasso;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -28,42 +19,47 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class DisplayStreams extends ActionBarActivity {
-    Context context = this;
-    private String TAG  = "Display All Streams";
+public class ViewNearbyPics extends ActionBarActivity {
+
     public final static String STREAM_NAME = "com.aptmini.jreacs.connexus.STREAM_NAME";
     public final static String OWNER_EMAIL = "com.aptmini.jreacs.connexus.OWNER_EMAIL";
+    Context context = this;
+    private String TAG  = "Display Nearby Pics";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display_streams);
+        setContentView(R.layout.activity_view_nearby_pics);
 
-        final String request_url = "http://apt2015mini.appspot.com/mviewAllStreams";
+        final String request_url = "http://apt2015mini.appspot.com/mviewNearby?latitude=" + Params.latitude + "&longitude=" +Params.longitude;
         AsyncHttpClient httpClient = new AsyncHttpClient();
         httpClient.get(request_url, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                final ArrayList<String> coverURLs = new ArrayList<String>();
+                final ArrayList<String> picURLs = new ArrayList<String>();
                 final ArrayList<String> streamNames = new ArrayList<String>();
                 final ArrayList<String> ownerEmails = new ArrayList<String>();
+                final ArrayList<String> distances = new ArrayList<String>();
                 try {
                     JSONObject jObject = new JSONObject(new String(response));
 
-                    JSONArray displayUrls = jObject.getJSONArray("coverURLs");
+                    JSONArray displayUrls = jObject.getJSONArray("picUrls");
                     JSONArray displayNames = jObject.getJSONArray("streamNames");
                     JSONArray displayOwner = jObject.getJSONArray("ownerEmails");
+                    JSONArray displayDists = jObject.getJSONArray("distances");
 
-                    for(int i=0;i<displayNames.length() && i < Params.maxStreams;i++) {
+                    for (int i = 0; i < displayNames.length() && i < Params.maxPictures; i++) {
 
-                        coverURLs.add(displayUrls.getString(i));
+                        picURLs.add(displayUrls.getString(i));
                         streamNames.add(displayNames.getString(i));
                         ownerEmails.add(displayOwner.getString(i));
+                        distances.add(displayDists.getString(i));
 
                         System.out.println(displayNames.getString(i));
                     }
-                    GridView gridview = (GridView) findViewById(R.id.gridview_streams);
-                    gridview.setAdapter(new ImageAdapter(context,coverURLs));
+                    GridView gridview = (GridView) findViewById(R.id.gridview_nearby);
+                    //gridview.setAdapter(new ImageAdapter(context, picURLs));
+                    gridview.setAdapter(new ImageTextAdapter(ViewNearbyPics.this, context, picURLs, distances));
                     gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View v,
@@ -73,7 +69,7 @@ public class DisplayStreams extends ActionBarActivity {
                             Intent intent = new Intent(context, ViewAStream.class);
                             String stream_name = streamNames.get(position);
                             String owner_email = ownerEmails.get(position);
-                            System.out.println("DisplayStreams, stream name: " + stream_name);
+                            System.out.println("NearbyStreams, stream name: " + stream_name);
                             intent.putExtra(STREAM_NAME, stream_name);
                             intent.putExtra(OWNER_EMAIL, owner_email);
                             startActivity(intent);
@@ -90,8 +86,7 @@ public class DisplayStreams extends ActionBarActivity {
                             imageDialog.show();*/
                         }
                     });
-                }
-                catch(JSONException j){
+                } catch (JSONException j) {
                     System.out.println("JSON Error");
                 }
 
@@ -104,44 +99,8 @@ public class DisplayStreams extends ActionBarActivity {
         });
     }
 
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        //Setting the location
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        Params.longitude = location.getLongitude();
-        Params.latitude = location.getLatitude();
-
-        System.out.println("********************");
-        System.out.println("Lng: " + Params.longitude);
-        System.out.println("Lat: " + Params.latitude);
-        System.out.println("********************");
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.display_images, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void viewNearbyPics(View view) {
-        Intent intent = new Intent(this, ViewNearbyPics.class);
+    public void viewAllStreams(View view) {
+        Intent intent = new Intent(this, DisplayStreams.class);
         startActivity(intent);
     }
 

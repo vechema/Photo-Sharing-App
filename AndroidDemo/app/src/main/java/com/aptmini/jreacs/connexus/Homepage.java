@@ -84,25 +84,11 @@ public class Homepage extends ActionBarActivity implements
     private Button mRevokeButton;
     private TextView mStatus;
 
-    public static double longitude;
-    public static double latitude;
-
     Context context = this;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_homepage);
-
-        //Setting the location
-        LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        double longitude = location.getLongitude();
-        double latitude = location.getLatitude();
-
-        System.out.println("********************");
-        System.out.println("Lng: " + longitude);
-        System.out.println("Lat: " + latitude);
-        System.out.println("********************");
 
         mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
         mSignOutButton = (Button) findViewById(R.id.sign_out_button);
@@ -123,6 +109,22 @@ public class Homepage extends ActionBarActivity implements
 
 
         mGoogleApiClient = buildGoogleApiClient();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        //Setting the location
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Params.longitude = location.getLongitude();
+        Params.latitude = location.getLatitude();
+
+        System.out.println("********************");
+        System.out.println("Lng: " + Params.longitude);
+        System.out.println("Lat: " + Params.latitude);
+        System.out.println("********************");
     }
 
     private void setGooglePlusButtonText(SignInButton signInButton, String buttonText) {
