@@ -11,6 +11,12 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -45,7 +51,7 @@
         <activity
             android:name=".ViewAStream"
             android:label="@string/title_activity_view_astream" >
-		</activity>
+        </activity>
         <activity
             android:name=".TakePhoto"
             android:label="@string/title_activity_take_photo"
@@ -53,6 +59,14 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.aptmini.jreacs.connexus.ImageUpload" />
+        </activity>
+        <activity
+            android:name=".Test"
+            android:label="@string/title_activity_test"
+            android:parentActivityName=".Homepage" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.aptmini.jreacs.connexus.Homepage" />
         </activity>
     </application>
 

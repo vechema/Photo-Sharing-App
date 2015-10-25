@@ -22,7 +22,8 @@ public class TakePhoto extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPreview = new Preview(this);
-        setContentView(R.layout.activity_take_photo);
+        setContentView(mPreview);
+        //setContentView(R.layout.activity_take_photo);
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         safeCameraOpen(0);
     }
@@ -33,8 +34,9 @@ public class TakePhoto extends ActionBarActivity {
 
         try {
             releaseCameraAndPreview();
-            mCamera = Camera.open(id);
+            mCamera = Camera.open();
             qOpened = (mCamera != null);
+            mPreview.setCamera(mCamera);
         } catch (Exception e) {
             Log.e(getString(R.string.app_name), "failed to open Camera");
             e.printStackTrace();
@@ -55,6 +57,9 @@ public class TakePhoto extends ActionBarActivity {
 
         SurfaceView mSurfaceView;
         SurfaceHolder mHolder;
+        Camera.Size mPreviewSize;
+        List<Camera.Size> mSupportedPreviewSizes;
+        Camera mCamera;
 
         Preview(Context context) {
             super(context);
@@ -106,19 +111,31 @@ public class TakePhoto extends ActionBarActivity {
             mCamera.startPreview();
         }
 
-        @Override
-        public void onClick(View v) {
-            switch(mPreviewState) {
-                case K_STATE_FROZEN:
-                    mCamera.startPreview();
-                    mPreviewState = K_STATE_PREVIEW;
-                    break;
+//        @Override
+//        public void onClick(View v) {
+//            switch(mPreviewState) {
+//                case K_STATE_FROZEN:
+//                    mCamera.startPreview();
+//                    mPreviewState = K_STATE_PREVIEW;
+//                    break;
+//
+//                default:
+//                    mCamera.takePicture( null, rawCallback, null);
+//                    mPreviewState = K_STATE_BUSY;
+//            } // switch
+//            shutterBtnConfig();
+//        }
 
-                default:
-                    mCamera.takePicture( null, rawCallback, null);
-                    mPreviewState = K_STATE_BUSY;
-            } // switch
-            shutterBtnConfig();
+        public void surfaceCreated(SurfaceHolder holder) {
+            // The Surface has been created, acquire the camera and tell it where
+            // to draw.
+            try {
+                if (mCamera != null) {
+                    mCamera.setPreviewDisplay(holder);
+                }
+            } catch (IOException exception) {
+                Log.e(getString(R.string.app_name), "IOException caused by setPreviewDisplay()");
+            }
         }
 
         public void surfaceDestroyed(SurfaceHolder holder) {
@@ -146,6 +163,37 @@ public class TakePhoto extends ActionBarActivity {
                 mCamera = null;
             }
         }
+
+        //Double check this onLayout code
+
+        @Override
+        protected void onLayout(boolean changed, int l, int t, int r, int b) {
+            if (changed && getChildCount() > 0) {
+                final View child = getChildAt(0);
+
+                final int width = r - l;
+                final int height = b - t;
+
+                int previewWidth = width;
+                int previewHeight = height;
+                if (mPreviewSize != null) {
+                    previewWidth = mPreviewSize.width;
+                    previewHeight = mPreviewSize.height;
+                }
+
+                // Center the child SurfaceView within the parent.
+                if (width * previewHeight > height * previewWidth) {
+                    final int scaledChildWidth = previewWidth * height / previewHeight;
+                    child.layout((width - scaledChildWidth) / 2, 0,
+                            (width + scaledChildWidth) / 2, height);
+                } else {
+                    final int scaledChildHeight = previewHeight * width / previewWidth;
+                    child.layout(0, (height - scaledChildHeight) / 2,
+                            width, (height + scaledChildHeight) / 2);
+                }
+            }
+        }
+
     }
 
 
