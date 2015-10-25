@@ -245,7 +245,6 @@ public class ImageUpload extends ActionBarActivity {
 
     public void takePicture(View view){
         Intent intent= new Intent(this, TakePhoto.class);
-
-        startActivity(intent);
+        startActivityForResult(intent, PICK_IMAGE);
     }
 }

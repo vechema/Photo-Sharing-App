@@ -1,7 +1,9 @@
 package com.aptmini.jreacs.connexus;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
@@ -33,11 +35,12 @@ public class TakePhoto extends ActionBarActivity {
     private static final String TAG = "takephoto-login";
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
+    Uri pic_uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test);
+        setContentView(R.layout.activity_take_photo);
 
         //create camera object
         final Camera myCamera = getCameraInstance();
@@ -191,7 +194,7 @@ public class TakePhoto extends ActionBarActivity {
                 Log.d(TAG, "Error creating media file, check storage permissions");
                 return;
             }
-
+            pic_uri = Uri.fromFile(pictureFile);
             try {
                 FileOutputStream fos = new FileOutputStream(pictureFile);
                 fos.write(data);
@@ -238,6 +241,11 @@ public class TakePhoto extends ActionBarActivity {
         return mediaFile;
     }
 
+    public void returnPicture(View view){
+        Intent intent = new Intent();
+        intent.setData(pic_uri);
+        setResult(RESULT_OK, intent);
+    }
 
 
 }
