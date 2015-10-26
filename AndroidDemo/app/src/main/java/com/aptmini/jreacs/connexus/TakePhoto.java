@@ -35,7 +35,9 @@ public class TakePhoto extends ActionBarActivity {
     private static final String TAG = "takephoto-login";
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
+    public static final String EXTRA_FILE = "take_file";
     Uri pic_uri;
+    File pictureFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,7 +191,7 @@ public class TakePhoto extends ActionBarActivity {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
 
-            File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+            pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
             if (pictureFile == null){
                 Log.d(TAG, "Error creating media file, check storage permissions");
                 return;
@@ -213,7 +215,7 @@ public class TakePhoto extends ActionBarActivity {
         // using Environment.getExternalStorageState() before doing this.
 
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "MyCameraApp");
+                Environment.DIRECTORY_PICTURES), "Connexus");
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
 
@@ -243,8 +245,12 @@ public class TakePhoto extends ActionBarActivity {
 
     public void returnPicture(View view){
         Intent intent = new Intent();
-        intent.setData(pic_uri);
+        intent.putExtra(EXTRA_FILE,pictureFile.toString());
+//        System.out.println(pictureFile.toString());
         setResult(RESULT_OK, intent);
+        releaseCamera();
+//        System.out.println("button pressed");
+        finish();
     }
 
 

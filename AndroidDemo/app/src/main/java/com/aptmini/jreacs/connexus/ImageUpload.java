@@ -1,5 +1,6 @@
 package com.aptmini.jreacs.connexus;
 
+import java.io.File;
 import java.io.IOException;
 
 import android.content.Context;
@@ -38,6 +39,7 @@ import java.util.Random;
 
 public class ImageUpload extends ActionBarActivity {
     private static final int PICK_IMAGE = 1;
+    private static final int TAKE_IMAGE = 2;
     Context context = this;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,6 +138,7 @@ public class ImageUpload extends ActionBarActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE && data != null && data.getData() != null) {
             Uri selectedImage = data.getData();
+            System.out.println(selectedImage);
 
             // User had pick an image.
 
@@ -152,6 +155,48 @@ public class ImageUpload extends ActionBarActivity {
             // Bitmap imaged created and show thumbnail
 
             ImageView imgView = (ImageView) findViewById(R.id.thumbnail);
+            System.out.println(imageFilePath);
+            System.out.println("DEBUGGING");
+            final Bitmap bitmapImage = BitmapFactory.decodeFile(imageFilePath);
+            imgView.setImageBitmap(bitmapImage);
+
+            // Enable the upload button once image has been uploaded
+
+            Button uploadButton = (Button) findViewById(R.id.upload_to_server);
+            uploadButton.setClickable(true);
+
+            uploadButton.setOnClickListener(
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            // Get photo caption
+
+                            EditText text = (EditText) findViewById(R.id.upload_message);
+                            String photoCaption = text.getText().toString();
+
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+                            byte[] b = baos.toByteArray();
+                            byte[] encodedImage = Base64.encode(b, Base64.DEFAULT);
+                            String encodedImageStr = encodedImage.toString();
+
+                            float[] latlng = getLatLong(imageFilePath);
+                            float lat = latlng[0];
+                            float lng = latlng[1];
+
+                            getUploadURL(b, photoCaption, lat, lng);
+                        }
+                    }
+            );
+        }
+        if (requestCode == TAKE_IMAGE && data != null) {
+            System.out.println("TAKE IMAGE");
+            final String imageFilePath = data.getStringExtra(TakePhoto.EXTRA_FILE);
+            System.out.println(imageFilePath);
+            ImageView imgView = (ImageView) findViewById(R.id.thumbnail);
+            System.out.println(imageFilePath);
+            System.out.println("DEBUGGING");
             final Bitmap bitmapImage = BitmapFactory.decodeFile(imageFilePath);
             imgView.setImageBitmap(bitmapImage);
 
@@ -245,6 +290,6 @@ public class ImageUpload extends ActionBarActivity {
 
     public void takePicture(View view){
         Intent intent= new Intent(this, TakePhoto.class);
-        startActivityForResult(intent, PICK_IMAGE);
+        startActivityForResult(intent, TAKE_IMAGE);
     }
 }
