@@ -38,6 +38,8 @@ public class TakePhoto extends ActionBarActivity {
     public static final String EXTRA_FILE = "take_file";
     Uri pic_uri;
     File pictureFile;
+    static Camera myCamera;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,14 +47,11 @@ public class TakePhoto extends ActionBarActivity {
         setContentView(R.layout.activity_take_photo);
 
         //create camera object
-        final Camera myCamera = getCameraInstance();
+        myCamera = getCameraInstance();
 
         //correct the camera's orientation
-        //STEP #2: Set the 'rotation' parameter
-        Camera.Parameters params = myCamera.getParameters();
-        params.setRotation(90);
-        myCamera.setParameters(params);
-
+        correctCameraOrientation(this);
+        
         //correct the preview's orientation
         setCameraDisplayOrientation(this, 0, myCamera);
 
@@ -248,6 +247,29 @@ public class TakePhoto extends ActionBarActivity {
 
         return mediaFile;
     }
+
+
+    public static void correctCameraOrientation(Activity mActivity){
+        //STEP #1: Get rotation degrees
+        Camera.CameraInfo info = new Camera.CameraInfo();
+        Camera.getCameraInfo(Camera.CameraInfo.CAMERA_FACING_BACK, info);
+        int rotation = mActivity.getWindowManager().getDefaultDisplay().getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0: degrees = 0; break; //Natural orientation
+            case Surface.ROTATION_90: degrees = 90; break; //Landscape left
+            case Surface.ROTATION_180: degrees = 180; break;//Upside down
+            case Surface.ROTATION_270: degrees = 270; break;//Landscape right
+        }
+        int rotate = (info.orientation - degrees + 360) % 360;
+
+        //STEP #2: Set the 'rotation' parameter
+        Camera.Parameters params = myCamera.getParameters();
+        params.setRotation(rotate);
+        myCamera.setParameters(params);
+    }
+
+
 
     public void returnPicture(View view){
         Intent intent = new Intent();
