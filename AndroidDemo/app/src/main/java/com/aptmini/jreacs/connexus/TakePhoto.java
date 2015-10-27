@@ -48,6 +48,12 @@ public class TakePhoto extends ActionBarActivity {
         final Camera myCamera = getCameraInstance();
 
         //correct the camera's orientation
+        //STEP #2: Set the 'rotation' parameter
+        Camera.Parameters params = myCamera.getParameters();
+        params.setRotation(90);
+        myCamera.setParameters(params);
+
+        //correct the preview's orientation
         setCameraDisplayOrientation(this, 0, myCamera);
 
         //create the camera preview and add it to the xml layout,
