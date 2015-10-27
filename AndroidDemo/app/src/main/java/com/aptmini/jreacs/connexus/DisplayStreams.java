@@ -74,7 +74,8 @@ public class DisplayStreams extends ActionBarActivity {
                         System.out.println(displayNames.getString(i));
                     }
                     GridView gridview = (GridView) findViewById(R.id.gridview_streams);
-                    gridview.setAdapter(new ImageAdapter(context,coverURLs));
+                    //gridview.setAdapter(new ImageAdapter(context,coverURLs));
+                    gridview.setAdapter(new ImageTextAdapter(DisplayStreams.this, context, coverURLs, streamNames));
                     gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View v,

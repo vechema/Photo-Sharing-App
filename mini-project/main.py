@@ -44,6 +44,7 @@ class Stream(ndb.Model):
     name = ndb.StringProperty()
     name_safe = ndb.StringProperty()
     creation_date = ndb.DateTimeProperty(auto_now_add=True)
+    update_date2 = ndb.DateTimeProperty()
     update_date = ndb.DateProperty()
     subscribers = ndb.StringProperty(repeated=True)
     tags = ndb.StringProperty(repeated=True)
@@ -537,6 +538,7 @@ class PhotoUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         stream.photos = list_pics
         # stream.photos.append(user_photo)
         # stream.photos[0] = user_photo
+        stream.update_date2 = datetime.datetime.now()
         stream.update_date = datetime.datetime.now()
         stream.put()
 
@@ -609,6 +611,8 @@ class CreateHandler(webapp2.RequestHandler):
         stream.subscribers = emails
         stream.tags = tag_list
         stream.cover_url = cover
+        stream.update_date = datetime.datetime.now()
+        stream.update_date2 = datetime.datetime.now()
 
         # Add teh owner of the stream
         user = users.get_current_user()
@@ -1159,6 +1163,7 @@ class mUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         # stream.photos.append(user_photo)
         # stream.photos[0] = user_photo
         stream.update_date = datetime.datetime.now()
+        stream.update_date2 = datetime.datetime.now()
         stream.put()
 
 
@@ -1209,7 +1214,7 @@ class mViewAllStreams(webapp2.RequestHandler):
         for stream in streams:
             streamList.append(stream)
 
-        #streamList = sorted(streamList, key=lambda k: k.update_date,reverse = True)
+        streamList = sorted(streamList, key=lambda k: k.update_date2,reverse = True)
 
         for stream in streamList:
             coverList.append(stream.cover_url)
@@ -1380,7 +1385,7 @@ class mSearch(webapp2.RequestHandler):
             for stream in streams:
                 streamList.append(stream)
 
-            #streamList = sorted(streamList, key=lambda k: k.update_date,reverse = True)
+            streamList = sorted(streamList, key=lambda k: k.update_date2,reverse = True)
 
             for stream in streamList:
                 coverList.append(stream.cover_url)
