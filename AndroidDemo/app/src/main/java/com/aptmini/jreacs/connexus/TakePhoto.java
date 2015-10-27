@@ -43,6 +43,7 @@ public class TakePhoto extends ActionBarActivity {
     static Camera myCamera;
     Activity mContext = this;
     Button use_pic_button;
+    int pic_flag;
 
 
     @Override
@@ -50,6 +51,7 @@ public class TakePhoto extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_photo);
         use_pic_button = (Button) findViewById(R.id.button_choose);
+        pic_flag = 0;
 
         //Setting the location
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -92,10 +94,19 @@ public class TakePhoto extends ActionBarActivity {
                     @Override
                     public void onClick(View v) {
                         //enable the choose button
-                        use_pic_button = (Button) findViewById(R.id.button_choose);
-                        use_pic_button.setClickable(true);
-                        // get an image from the camera
-                        myCamera.takePicture(null, null, mPicture);
+                        if (pic_flag == 0) {
+                            pic_flag = 1;
+                            use_pic_button = (Button) findViewById(R.id.button_choose);
+                            use_pic_button.setClickable(true);
+                            // get an image from the camera
+                            myCamera.takePicture(null, null, mPicture);
+                        }
+                        else if (pic_flag == 1){
+                            System.out.println("YOU'VE ALREADY TAKEN A PIC!!");
+                            pic_flag = 0;
+                            myCamera.stopPreview();
+                            myCamera.startPreview();
+                        }
                     }
                 }
         );
