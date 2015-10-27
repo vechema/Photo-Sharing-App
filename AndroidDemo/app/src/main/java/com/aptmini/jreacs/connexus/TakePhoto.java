@@ -39,6 +39,7 @@ public class TakePhoto extends ActionBarActivity {
     Uri pic_uri;
     File pictureFile;
     static Camera myCamera;
+    Activity mContext = this;
 
 
     @Override
@@ -47,10 +48,12 @@ public class TakePhoto extends ActionBarActivity {
         setContentView(R.layout.activity_take_photo);
 
         //create camera object
-        myCamera = getCameraInstance();
+        if (myCamera == null) {
+            myCamera = getCameraInstance();
+        }
 
         //correct the camera's orientation
-        correctCameraOrientation(this);
+        correctCameraOrientation(this,myCamera);
 
         //correct the preview's orientation
         setCameraDisplayOrientation(this, 0, myCamera);
@@ -81,6 +84,7 @@ public class TakePhoto extends ActionBarActivity {
         //releaseMediaRecorder();       // if you are using MediaRecorder, release it first
         releaseCamera();              // release the camera immediately on pause event
     }
+
 
     //releases the camera
     private void releaseCamera(){
@@ -133,7 +137,7 @@ public class TakePhoto extends ActionBarActivity {
         }
 
         public void surfaceDestroyed(SurfaceHolder holder) {
-            // empty. Take care of releasing the Camera preview in your activity.
+            releaseCamera();
         }
 
         public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
@@ -154,6 +158,11 @@ public class TakePhoto extends ActionBarActivity {
 
             // set preview size and make any resize, rotate or
             // reformatting changes here
+            //correct the camera's orientation
+//            correctCameraOrientation(mContext, mCamera);
+
+            //correct the preview's orientation
+//            setCameraDisplayOrientation(mContext, 0, mCamera);
 
             // start preview with new settings
             try {
@@ -249,7 +258,7 @@ public class TakePhoto extends ActionBarActivity {
     }
 
 
-    public static void correctCameraOrientation(Activity mActivity){
+    public static void correctCameraOrientation(Activity mActivity, Camera mCamera){
         //STEP #1: Get rotation degrees
         Camera.CameraInfo info = new Camera.CameraInfo();
         Camera.getCameraInfo(Camera.CameraInfo.CAMERA_FACING_BACK, info);
@@ -264,9 +273,9 @@ public class TakePhoto extends ActionBarActivity {
         int rotate = (info.orientation - degrees + 360) % 360;
 
         //STEP #2: Set the 'rotation' parameter
-        Camera.Parameters params = myCamera.getParameters();
+        Camera.Parameters params = mCamera.getParameters();
         params.setRotation(rotate);
-        myCamera.setParameters(params);
+        mCamera.setParameters(params);
     }
 
 
