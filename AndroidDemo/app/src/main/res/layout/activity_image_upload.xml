@@ -12,6 +12,15 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/stream_name_upload"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="40sp"
+            android:paddingBottom = "40sp"
+            />
+
         <Button
             android:id="@+id/view_all_images"
             android:layout_width="match_parent"
