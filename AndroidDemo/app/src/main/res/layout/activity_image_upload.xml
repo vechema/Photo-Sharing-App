@@ -22,14 +22,6 @@
             />
 
         <Button
-            android:id="@+id/view_all_images"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/viewAllStreamsActivity"
-            android:onClick="viewAllStreams"
-            />
-
-        <Button
             android:id="@+id/choose_from_library"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -63,6 +55,14 @@
             android:text="@string/uploadImage"
             android:clickable="false"
             android:id="@+id/upload_to_server"
+            />
+
+        <Button
+            android:id="@+id/view_all_images"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/viewAllStreamsActivity"
+            android:onClick="viewAllStreams"
             />
     </LinearLayout>
 </ScrollView>
