@@ -1,27 +1,18 @@
 package com.aptmini.jreacs.connexus;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.squareup.picasso.Picasso;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -30,27 +21,25 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class DisplayStreams extends ActionBarActivity {
+public class Search extends ActionBarActivity {
     Context context = this;
-    private String TAG  = "Display All Streams";
-    public final static String STREAM_NAME = "com.aptmini.jreacs.connexus.STREAM_NAME";
-    public final static String OWNER_EMAIL = "com.aptmini.jreacs.connexus.OWNER_EMAIL";
+    private String TAG  = "Search";
     public final static String SEARCH_TERMS = "com.aptmini.jreacs.connexus.SEARCH_TERMS";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display_streams);
 
-        TextView morePicsText= (TextView) findViewById(R.id.subscribed);
+        // Get the message from the intent
+        Intent intent = getIntent();
+        String message = intent.getStringExtra(DisplayStreams.SEARCH_TERMS);
+        System.out.println("WHAT WAS SEARCHED: " + message);
 
-        if (Homepage.email != null) {
-            morePicsText.setVisibility(View.VISIBLE);
-        } else {
-            morePicsText.setVisibility(View.GONE);
-        }
+        setContentView(R.layout.activity_search);
 
-        final String request_url = "http://apt2015mini.appspot.com/mviewAllStreams";
+        TextView numResults = (TextView) findViewById(R.id.search_results);
+
+        final String request_url = "http://apt2015mini.appspot.com/msearch?terms="+message;
         AsyncHttpClient httpClient = new AsyncHttpClient();
         httpClient.get(request_url, new AsyncHttpResponseHandler() {
             @Override
@@ -85,8 +74,8 @@ public class DisplayStreams extends ActionBarActivity {
                             String stream_name = streamNames.get(position);
                             String owner_email = ownerEmails.get(position);
                             System.out.println("DisplayStreams, stream name: " + stream_name);
-                            intent.putExtra(STREAM_NAME, stream_name);
-                            intent.putExtra(OWNER_EMAIL, owner_email);
+                            //intent.putExtra(STREAM_NAME, stream_name);
+                            //intent.putExtra(OWNER_EMAIL, owner_email);
                             startActivity(intent);
 
                             /*Toast.makeText(context, streamNames.get(position), Toast.LENGTH_SHORT).show();
@@ -115,58 +104,6 @@ public class DisplayStreams extends ActionBarActivity {
         });
     }
 
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        //Setting the location
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (location == null){
-            Params.longitude = 0;
-            Params.latitude = 0;
-
-        } else {
-            Params.longitude = location.getLongitude();
-            Params.latitude = location.getLatitude();
-        }
-
-        System.out.println("********************");
-        System.out.println("Lng: " + Params.longitude);
-        System.out.println("Lat: " + Params.latitude);
-        System.out.println("********************");
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.display_images, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void viewNearbyPics(View view) {
-        Intent intent = new Intent(this, ViewNearbyPics.class);
-        startActivity(intent);
-    }
-
-    public void viewSubscribed(View view) {
-        Intent intent = new Intent(this, ViewSubscribed.class);
-        startActivity(intent);
-    }
-
     public void search(View view) {
         Intent intent = new Intent(this, Search.class);
         EditText editText = (EditText) findViewById(R.id.search_message);
@@ -177,3 +114,5 @@ public class DisplayStreams extends ActionBarActivity {
     }
 
 }
+
+

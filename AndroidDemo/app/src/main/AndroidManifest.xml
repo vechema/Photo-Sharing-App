@@ -72,6 +72,10 @@
             android:name=".ViewSubscribed"
             android:label="@string/title_activity_view_subscribed" >
         </activity>
+        <activity
+            android:name=".Search"
+            android:label="@string/title_activity_search" >
+        </activity>
     </application>
 
 </manifest>

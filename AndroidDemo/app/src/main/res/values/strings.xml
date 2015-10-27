@@ -22,6 +22,9 @@
     <string name="morePics">More Pics</string>
     <string name="uploadphoto">Upload an Image</string>
     <string name="subscribedStreams">My Subscribed Streams</string>
+    <string name="search_message">Find Streams</string>
+    <string name="search">Search</string>
+    <string name="search_numbers">No search results</string>
 
 
     <string name="circles_title">Visible circles:</string>
@@ -53,6 +56,7 @@
     <string name="title_activity_test">Test</string>
     <string name="title_activity_view_nearby_pics">ViewNearbyPics</string>
     <string name="title_activity_view_subscribed">ViewSubscribed</string>
+    <string name="title_activity_search">Search</string>
 
 
 

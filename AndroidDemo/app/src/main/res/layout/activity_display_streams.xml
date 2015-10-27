@@ -27,6 +27,17 @@
         android:stretchMode="columnWidth"
         android:gravity="center"
         />
+    <EditText android:id="@+id/search_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/search_message" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/search"
+        android:id="@+id/search_thing"
+        android:onClick="search"
+        />
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

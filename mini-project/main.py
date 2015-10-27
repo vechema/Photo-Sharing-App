@@ -1366,6 +1366,15 @@ class mSubscribed(webapp2.RequestHandler):
         jsonObj = json.dumps(dictPassed, sort_keys=True,indent=4, separators=(',', ': '))
         self.response.write(jsonObj)
 
+class mSearch(webapp2.RequestHandler):
+    def get(self):
+        terms = self.request.get('terms')
+
+        dictPassed = {
+        }
+        jsonObj = json.dumps(dictPassed, sort_keys=True,indent=4, separators=(',', ': '))
+        self.response.write(jsonObj)
+
 app = webapp2.WSGIApplication([
     ('/logincheck', LoginCheckHandler),
     ('/searchrequest', SearchRequestHandler),
@@ -1404,5 +1413,6 @@ app = webapp2.WSGIApplication([
     ('/mview', mViewAStream),
     ('/mviewNearby', mViewNearby),
     ('/mviewSubscribed', mSubscribed),
+    ('/msearch', mSearch),
 
     ], debug=True)
