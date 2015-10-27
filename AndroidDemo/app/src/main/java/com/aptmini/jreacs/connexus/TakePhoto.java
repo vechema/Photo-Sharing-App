@@ -51,7 +51,7 @@ public class TakePhoto extends ActionBarActivity {
 
         //correct the camera's orientation
         correctCameraOrientation(this);
-        
+
         //correct the preview's orientation
         setCameraDisplayOrientation(this, 0, myCamera);
 
