@@ -1199,7 +1199,7 @@ class mViewAllPhotos(webapp2.RequestHandler):
 
 class mViewAllStreams(webapp2.RequestHandler):
     def get(self):
-        stream_query = Stream.query().order(-Stream.creation_date)
+        stream_query = Stream.query().order(Stream.update_date)
         streams = stream_query.fetch(400)
         streamList = []
         coverList = []
@@ -1207,9 +1207,9 @@ class mViewAllStreams(webapp2.RequestHandler):
         ownerList = []
 
         for stream in streams:
-            streamList.append(stream);
+            streamList.append(stream)
 
-        streamList = sorted(streamList, key=lambda k: k.update_date,reverse = True)
+        #streamList = sorted(streamList, key=lambda k: k.update_date,reverse = True)
 
         for stream in streamList:
             coverList.append(stream.cover_url)
@@ -1228,10 +1228,20 @@ class mViewAllStreams(webapp2.RequestHandler):
 class mViewAStream(webapp2.RequestHandler):
     def get(self):
         stream_name = self.request.get('stream')
+        cur_user = self.request.get('user') + "@gmail.com"
         stream_query = Stream.query(Stream.name == stream_name)
         streams = stream_query.fetch()
         stream = streams[0]
         pics = stream.photos
+
+        owner = str(stream.owner)[:str(stream.owner).index('@')]
+
+        if owner is not cur_user:
+            views = stream.view_count
+            now = datetime.datetime.now()
+            views.append(now)
+            stream.view_count = views
+
 
         picURLList = []
         picCaptionList = []
@@ -1239,7 +1249,7 @@ class mViewAStream(webapp2.RequestHandler):
         for pic in pics:
             picURLList.append(pic.pic_url)
             picCaptionList.append(pic.comment)
-
+        stream.put()
 
         dictPassed = {
             'picUrls': picURLList,
@@ -1354,7 +1364,7 @@ class mSearch(webapp2.RequestHandler):
         ownerList = []
 
         if self.request.get('terms') == '':
-
+            None
         else:
 
             query_list = self.request.get('terms').replace(',', '').split(" ")
@@ -1370,7 +1380,7 @@ class mSearch(webapp2.RequestHandler):
             for stream in streams:
                 streamList.append(stream)
 
-            streamList = sorted(streamList, key=lambda k: k.update_date,reverse = True)
+            #streamList = sorted(streamList, key=lambda k: k.update_date,reverse = True)
 
             for stream in streamList:
                 coverList.append(stream.cover_url)

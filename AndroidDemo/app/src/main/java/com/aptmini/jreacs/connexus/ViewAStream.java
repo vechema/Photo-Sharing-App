@@ -71,6 +71,7 @@ public class ViewAStream extends ActionBarActivity {
         if (Homepage.email != null) {
             home_email = formatEmail(Homepage.email);
         }
+        String format_home_email = home_email.substring(0,home_email.indexOf('@'));
 
         if(owner_email.equals(home_email))
         {
@@ -90,7 +91,8 @@ public class ViewAStream extends ActionBarActivity {
         System.out.println("CURRENT EMAIL: " + Homepage.email);
         System.out.println("Am I the owner?: " + isOwner);
 
-        final String request_url = "http://apt2015mini.appspot.com/mview?stream=" + stream_name;
+        final String request_url = "http://apt2015mini.appspot.com/mview?stream=" + stream_name + "&user=" + format_home_email;
+        System.out.println(request_url);
         AsyncHttpClient httpClient = new AsyncHttpClient();
         httpClient.get(request_url, new AsyncHttpResponseHandler() {
             @Override
