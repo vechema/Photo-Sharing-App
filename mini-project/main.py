@@ -1083,27 +1083,6 @@ class SendDayHandler(webapp2.RequestHandler):
 class SearchResultsHandler(webapp2.RequestHandler):
     def get(self):
 
-        # #set already known key for leader information
-        # thekey = ndb.Key(Cache, 'cachekey')
-        #
-        # #check to see if leader information is available yet
-        # if(thekey.get()==None):
-        #     cache_retrieved = []
-        #
-        # else:
-        #     #GETS THE CACHE FROM THE DATASTORE
-        #     cache_retrieved = thekey.get()
-        #
-        # # testing = ["apple","cake"]
-        #
-        # template_values = {
-        #     'available2' : cache_retrieved.elements
-        #     # 'available2' : testing
-        # }
-        # template = JINJA_ENVIRONMENT.get_template('templates/search.html')
-        #
-        # self.response.write(template.render(template_values))
-
         if self.request.get('thequery') == '':
             allstreams = []
             result_count = 0
@@ -1121,6 +1100,7 @@ class SearchResultsHandler(webapp2.RequestHandler):
 
             allstreams = stream_query.order(-Stream.creation_date).fetch(5)
             result_count = len(allstreams)
+
         template_values ={
             'streams' : allstreams,
             'count' : result_count,
@@ -1368,12 +1348,45 @@ class mSubscribed(webapp2.RequestHandler):
 
 class mSearch(webapp2.RequestHandler):
     def get(self):
-        terms = self.request.get('terms')
+        streamList = []
+        coverList = []
+        nameList = []
+        ownerList = []
+
+        if self.request.get('terms') == '':
+
+        else:
+
+            query_list = self.request.get('terms').replace(',', '').split(" ")
+            #allstreams = []
+            stream_query = Stream.query()
+            for eachquery in query_list:
+                if eachquery != '':
+                    stream_query = stream_query.filter(ndb.OR(Stream.name == eachquery,
+                                                        Stream.tags == eachquery))
+
+            streams = stream_query.order(-Stream.creation_date).fetch()
+
+            for stream in streams:
+                streamList.append(stream)
+
+            streamList = sorted(streamList, key=lambda k: k.update_date,reverse = True)
+
+            for stream in streamList:
+                coverList.append(stream.cover_url)
+                nameList.append(stream.name)
+                ownerList.append(stream.owner)
 
         dictPassed = {
+            'coverURLs' : coverList,
+            'streamNames' : nameList,
+            'ownerEmails' : ownerList,
         }
         jsonObj = json.dumps(dictPassed, sort_keys=True,indent=4, separators=(',', ': '))
         self.response.write(jsonObj)
+
+
+
 
 app = webapp2.WSGIApplication([
     ('/logincheck', LoginCheckHandler),
