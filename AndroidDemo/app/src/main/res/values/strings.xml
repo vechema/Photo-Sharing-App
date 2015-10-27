@@ -25,6 +25,7 @@
     <string name="search_message">Find Streams</string>
     <string name="search">Search</string>
     <string name="search_numbers">No search results</string>
+    <string name="moreResults">More search results</string>
 
 
     <string name="circles_title">Visible circles:</string>
