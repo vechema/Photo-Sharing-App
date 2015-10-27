@@ -284,6 +284,7 @@ public class ImageUpload extends ActionBarActivity {
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
                 Log.w("async", "success!!!!");
                 Toast.makeText(context, "Upload Successful", Toast.LENGTH_SHORT).show();
+//                finish();
             }
 
             @Override

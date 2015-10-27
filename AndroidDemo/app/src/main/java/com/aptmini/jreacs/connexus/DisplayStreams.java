@@ -111,8 +111,14 @@ public class DisplayStreams extends ActionBarActivity {
         //Setting the location
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        Params.longitude = location.getLongitude();
-        Params.latitude = location.getLatitude();
+        if (location == null){
+            Params.longitude = 0;
+            Params.latitude = 0;
+
+        } else {
+            Params.longitude = location.getLongitude();
+            Params.latitude = location.getLatitude();
+        }
 
         System.out.println("********************");
         System.out.println("Lng: " + Params.longitude);

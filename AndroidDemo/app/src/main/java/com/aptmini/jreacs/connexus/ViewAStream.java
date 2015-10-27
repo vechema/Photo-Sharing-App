@@ -195,6 +195,7 @@ public class ViewAStream extends ActionBarActivity {
         Intent intent = new Intent(this, ImageUpload.class);
         intent.putExtra(STREAM_NAME, stream_name);
         startActivity(intent);
+//        startActivityForResult(intent, 1);
     }
 
 }
