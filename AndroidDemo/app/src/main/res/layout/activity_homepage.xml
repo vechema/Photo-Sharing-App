@@ -59,27 +59,12 @@
             />
 
         <Button
-            android:id="@+id/view_all_images"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/imagePage"
-            android:onClick="viewAllImages"
-            />
-
-        <Button
             android:id="@+id/testing"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="test"
             android:onClick="Testing"
             />
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/uploadImageActivity"
-            android:clickable="false"
-            android:id="@+id/open_image_upload_page"/>
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

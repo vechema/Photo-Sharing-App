@@ -3,6 +3,8 @@ package com.aptmini.jreacs.connexus;
 import android.app.Activity;
 import android.content.Intent;
 import android.hardware.Camera;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -46,6 +48,23 @@ public class TakePhoto extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_photo);
+
+        //Setting the location
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (location == null){
+            Params.longitude = 0;
+            Params.latitude = 0;
+
+        } else {
+            Params.longitude = location.getLongitude();
+            Params.latitude = location.getLatitude();
+        }
+
+        System.out.println("********************");
+        System.out.println("Lng: " + Params.longitude);
+        System.out.println("Lat: " + Params.latitude);
+        System.out.println("********************");
 
         //create camera object
         if (myCamera == null) {

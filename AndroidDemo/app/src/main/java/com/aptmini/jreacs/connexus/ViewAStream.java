@@ -85,7 +85,7 @@ public class ViewAStream extends ActionBarActivity {
         System.out.println("ViewAStream stream name: " + stream_name);
 
         TextView myTextView= (TextView) findViewById(R.id.stream_name_view);
-        myTextView.setText(stream_name);
+        myTextView.setText("View a Stream: " + stream_name);
 
         System.out.println("CURRENT EMAIL: " + Homepage.email);
         System.out.println("Am I the owner?: " + isOwner);

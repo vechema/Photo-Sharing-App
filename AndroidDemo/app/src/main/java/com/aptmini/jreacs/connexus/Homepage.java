@@ -261,7 +261,7 @@ public class Homepage extends ActionBarActivity implements
 
         mStatus.setText(email + " is currently Signed In");
 
-        Button uploadButton = (Button) findViewById(R.id.open_image_upload_page);
+        /*Button uploadButton = (Button) findViewById(R.id.open_image_upload_page);
         uploadButton.setClickable(true);
 
         uploadButton.setOnClickListener(
@@ -272,7 +272,7 @@ public class Homepage extends ActionBarActivity implements
                         startActivity(intent);
                     }
                 }
-        );
+        );*/
     }
 
     /* onConnectionFailed is called when our Activity could not connect to Google
@@ -379,8 +379,8 @@ public class Homepage extends ActionBarActivity implements
         mRevokeButton.setEnabled(false);
 
         mStatus.setText("Signed out");
-        Button uploadButton = (Button) findViewById(R.id.open_image_upload_page);
-        uploadButton.setClickable(false);
+        /*Button uploadButton = (Button) findViewById(R.id.open_image_upload_page);
+        uploadButton.setClickable(false);*/
         email = null;
 
         if (imageView != null) {
