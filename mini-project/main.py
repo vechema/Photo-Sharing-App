@@ -1354,7 +1354,7 @@ class mSearch(webapp2.RequestHandler):
         ownerList = []
 
         if self.request.get('terms') == '':
-
+            None
         else:
 
             query_list = self.request.get('terms').replace(',', '').split(" ")
@@ -1370,7 +1370,7 @@ class mSearch(webapp2.RequestHandler):
             for stream in streams:
                 streamList.append(stream)
 
-            streamList = sorted(streamList, key=lambda k: k.update_date,reverse = True)
+            #streamList = sorted(streamList, key=lambda k: k.update_date,reverse = True)
 
             for stream in streamList:
                 coverList.append(stream.cover_url)

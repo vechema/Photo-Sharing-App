@@ -72,7 +72,7 @@ public class Search extends ActionBarActivity {
                     JSONArray displayUrls = jObject.getJSONArray("coverURLs");
                     JSONArray displayNames = jObject.getJSONArray("streamNames");
                     JSONArray displayOwner = jObject.getJSONArray("ownerEmails");
-                    
+
                     TextView numResults = (TextView) findViewById(R.id.search_results);
                     numResults.setText(displayUrls.length()+" results for "+ search_terms);
 
