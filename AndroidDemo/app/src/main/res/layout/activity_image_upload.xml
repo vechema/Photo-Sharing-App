@@ -16,8 +16,8 @@
             android:id="@+id/view_all_images"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/imagePage"
-            android:onClick="viewAllImages"
+            android:text="@string/viewAllStreamsActivity"
+            android:onClick="viewAllStreams"
             />
 
         <Button

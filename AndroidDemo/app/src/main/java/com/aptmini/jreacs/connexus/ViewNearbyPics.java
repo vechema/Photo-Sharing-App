@@ -52,6 +52,8 @@ public class ViewNearbyPics extends ActionBarActivity {
         System.out.println("**Picture number we're on: " + picNum);
 
         final String request_url = "http://apt2015mini.appspot.com/mviewNearby?latitude=" + Params.latitude + "&longitude=" +Params.longitude;
+        System.out.println("Request url: " + request_url);
+
         AsyncHttpClient httpClient = new AsyncHttpClient();
         httpClient.get(request_url, new AsyncHttpResponseHandler() {
             @Override

@@ -41,10 +41,16 @@ public class ImageUpload extends ActionBarActivity {
     private static final int PICK_IMAGE = 1;
     private static final int TAKE_IMAGE = 2;
     Context context = this;
+
+    String streamName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        streamName = intent.getStringExtra(ViewAStream.STREAM_NAME);
         setContentView(R.layout.activity_image_upload);
+        System.out.println("!!STREAM NAME: " + streamName);
 
         // Choose image from library
         Button chooseFromLibraryButton = (Button) findViewById(R.id.choose_from_library);
@@ -185,7 +191,7 @@ public class ImageUpload extends ActionBarActivity {
                             float lat = latlng[0];
                             float lng = latlng[1];
 
-                            getUploadURL(b, photoCaption, lat, lng);
+                            getUploadURL(b, photoCaption, lat, lng, streamName);
                         }
                     }
             );
@@ -221,18 +227,21 @@ public class ImageUpload extends ActionBarActivity {
                             byte[] encodedImage = Base64.encode(b, Base64.DEFAULT);
                             String encodedImageStr = encodedImage.toString();
 
-                            float[] latlng = getLatLong(imageFilePath);
-                            float lat = latlng[0];
-                            float lng = latlng[1];
+                            double lat = Params.latitude;
+                            double lng = Params.longitude;
+                            System.out.println("**Sent a taken photo: ");
+                            System.out.println("\tlat: " + lat);
+                            System.out.println("\tlng: " + lng);
+                            System.out.println("\tname: " + streamName);
 
-                            getUploadURL(b, photoCaption, lat, lng);
+                            getUploadURL(b, photoCaption, lat, lng, streamName);
                         }
                     }
             );
         }
     }
 
-    private void getUploadURL(final byte[] encodedImage, final String photoCaption, final float lat, final float lng){
+    private void getUploadURL(final byte[] encodedImage, final String photoCaption, final double lat, final double lng, final String stream_name){
         AsyncHttpClient httpClient = new AsyncHttpClient();
         String request_url="http://apt2015mini.appspot.com/mgetUploadURL";
         System.out.println(request_url);
@@ -246,7 +255,7 @@ public class ImageUpload extends ActionBarActivity {
                     JSONObject jObject = new JSONObject(new String(response));
 
                     upload_url = jObject.getString("upload_url");
-                    postToServer(encodedImage, photoCaption, upload_url, lat, lng);
+                    postToServer(encodedImage, photoCaption, upload_url, lat, lng, stream_name);
 
                 } catch (JSONException j) {
                     System.out.println("JSON Error");
@@ -260,13 +269,15 @@ public class ImageUpload extends ActionBarActivity {
         });
     }
 
-    private void postToServer(byte[] encodedImage,String photoCaption, String upload_url, float lat, float lng){
+    private void postToServer(byte[] encodedImage,String photoCaption, String upload_url, double lat, double lng, String stream_name){
         System.out.println(upload_url);
         RequestParams params = new RequestParams();
         params.put("file",new ByteArrayInputStream(encodedImage));
         params.put("photoCaption",photoCaption);
         params.put("latitude", lat);
         params.put("longitude", lng);
+        params.put("stream_name", stream_name);
+        System.out.println("STREAM NAME in post: " + stream_name);
         AsyncHttpClient client = new AsyncHttpClient();
         client.post(upload_url, params, new AsyncHttpResponseHandler() {
             @Override
@@ -291,5 +302,10 @@ public class ImageUpload extends ActionBarActivity {
     public void takePicture(View view){
         Intent intent= new Intent(this, TakePhoto.class);
         startActivityForResult(intent, TAKE_IMAGE);
+    }
+
+    public void viewAllStreams(View view) {
+        Intent intent = new Intent(this, DisplayStreams.class);
+        startActivity(intent);
     }
 }

@@ -1163,7 +1163,25 @@ class mUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         user_photo.latitude=float(self.request.params['latitude']);
         user_photo.longitude=float(self.request.params['longitude']);
         # Also need to set longitude and latitude
+        stream_name = self.request.params['stream_name'];
+        user_photo.stream_name = stream_name
         user_photo.put()
+
+        # Add the picture to it's stream
+        stream_query = Stream.query(Stream.name == stream_name)
+        streams = stream_query.fetch()
+        stream = streams[0]
+
+        list_pics = stream.photos
+        list_pics.insert(0, user_photo)
+        # list_pics.append(user_photo)
+        stream.photos = list_pics
+        # stream.photos.append(user_photo)
+        # stream.photos[0] = user_photo
+        stream.update_date = datetime.datetime.now()
+        stream.put()
+
+
 
 
 class mViewAllPhotos(webapp2.RequestHandler):
@@ -1174,6 +1192,7 @@ class mViewAllPhotos(webapp2.RequestHandler):
         imageCaptionList = []
         imageLatList = []
         imageLngList = []
+        imageStream = []
         for pic in imageQuery:
             imageList.append(pic)
 
@@ -1185,12 +1204,14 @@ class mViewAllPhotos(webapp2.RequestHandler):
             imageCaptionList.append(pic.comment)
             imageLatList.append(pic.latitude)
             imageLngList.append(pic.longitude)
+            imageStream.append(pic.stream_name)
 
         dictPassed = {
             'displayImages':imageURLList,
             'imageCaptionList':imageCaptionList,
             'latitudeList':imageLatList,
             'longitudeList':imageLngList,
+            'stream_names':imageStream,
         }
         jsonObj = json.dumps(dictPassed, sort_keys=True,indent=4, separators=(',', ': '))
         self.response.write(jsonObj)
@@ -1208,7 +1229,7 @@ class mViewAllStreams(webapp2.RequestHandler):
         for stream in streams:
             streamList.append(stream);
 
-        streamList = sorted(streamList, key=lambda k: k.upload_date,reverse = True)
+        streamList = sorted(streamList, key=lambda k: k.update_date,reverse = True)
 
         for stream in streamList:
             coverList.append(stream.cover_url)

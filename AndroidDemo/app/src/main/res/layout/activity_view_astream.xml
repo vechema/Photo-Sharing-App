@@ -37,6 +37,13 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="@string/uploadphoto"
+        android:id="@+id/upload_photo"
+        android:onClick="uploadPic"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/viewAllStreamsActivity"
         android:id="@+id/view_all_streams"
         android:onClick="viewAllStreams"
