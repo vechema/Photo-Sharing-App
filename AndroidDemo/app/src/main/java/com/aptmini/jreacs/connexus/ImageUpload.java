@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -51,6 +52,9 @@ public class ImageUpload extends ActionBarActivity {
         streamName = intent.getStringExtra(ViewAStream.STREAM_NAME);
         setContentView(R.layout.activity_image_upload);
         System.out.println("!!STREAM NAME: " + streamName);
+
+        TextView myTextView= (TextView) findViewById(R.id.stream_name_upload);
+        myTextView.setText("Stream: " + streamName);
 
         // Choose image from library
         Button chooseFromLibraryButton = (Button) findViewById(R.id.choose_from_library);
@@ -142,6 +146,7 @@ public class ImageUpload extends ActionBarActivity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == PICK_IMAGE && data != null && data.getData() != null) {
             Uri selectedImage = data.getData();
             System.out.println(selectedImage);
@@ -192,6 +197,7 @@ public class ImageUpload extends ActionBarActivity {
                             float lng = latlng[1];
 
                             getUploadURL(b, photoCaption, lat, lng, streamName);
+
                         }
                     }
             );
