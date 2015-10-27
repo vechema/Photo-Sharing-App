@@ -68,10 +68,12 @@ public class ViewAStream extends ActionBarActivity {
         owners_email = owner_email;
 
         String home_email = null;
+        String format_home_email = null;
         if (Homepage.email != null) {
             home_email = formatEmail(Homepage.email);
+            format_home_email = home_email.substring(0,home_email.indexOf('@'));
         }
-        String format_home_email = home_email.substring(0,home_email.indexOf('@'));
+
 
         if(owner_email.equals(home_email))
         {
@@ -79,7 +81,7 @@ public class ViewAStream extends ActionBarActivity {
             isOwner = true;
         } else {
             isOwner = false;
-            //uploadPicText.setVisibility(View.GONE);
+            uploadPicText.setVisibility(View.GONE);
         }
 
         stream_name = intent.getStringExtra(DisplayStreams.STREAM_NAME);

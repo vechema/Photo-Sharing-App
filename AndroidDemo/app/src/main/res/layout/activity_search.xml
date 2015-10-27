@@ -44,4 +44,12 @@
         android:onClick="viewMoreResults"
         />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/viewAllStreamsActivity"
+        android:id="@+id/view_all_streams"
+        android:onClick="viewAllStreams"
+        />
+
 </LinearLayout>

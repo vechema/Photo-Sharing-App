@@ -160,6 +160,11 @@ public class Search extends ActionBarActivity {
 
     }
 
+    public void viewAllStreams(View view) {
+        Intent intent = new Intent(this, DisplayStreams.class);
+        startActivity(intent);
+    }
+
 }
 
 

@@ -57,14 +57,6 @@
             android:textSize="40sp"
             android:paddingBottom = "40sp"
             />
-
-        <Button
-            android:id="@+id/testing"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="test"
-            android:onClick="Testing"
-            />
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
