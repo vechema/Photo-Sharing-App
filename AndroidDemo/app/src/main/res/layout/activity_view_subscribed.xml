@@ -8,7 +8,7 @@
     tools:context="com.aptmini.jreacs.connexus.DisplayStreams">
 
     <TextView
-        android:text="@string/allStreams"
+        android:text="@string/subscribedStreams"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -37,8 +37,8 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/subscribedStreams"
-        android:id="@+id/subscribed"
-        android:onClick="viewSubscribed"
+        android:text="@string/viewAllStreamsActivity"
+        android:id="@+id/view_all_streams"
+        android:onClick="viewAllStreams"
         />
 </LinearLayout>

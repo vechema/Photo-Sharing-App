@@ -1324,6 +1324,48 @@ def calcDist(latit1, long1, latit2, long2):
     d = R * c #(where R is the radius of the Earth)
     return d
 
+class mSubscribed(webapp2.RequestHandler):
+    def get(self):
+
+        email = self.request.get('owner') + "@gmail.com"
+        user_query = MyUser.query(MyUser.email == email)
+        users = user_query.fetch()
+        user = users[0]
+        streamList = []
+        picList = []
+
+        # All the streams they are subscribed to...
+        for key in user.streams_subscribe:
+            streamList.append(key.get())
+
+        for stream in streamList:
+            for pic in stream.photos:
+                picList.append(pic);
+
+        picList = sorted(picList, key=lambda k: k.upload_date,reverse = True)
+
+        #Need to return: 1- url of photos, 2- stream names 3- owner email
+        urlList = []
+        streamNames = []
+        emailList = []
+        for pic in picList:
+            urlList.append(pic.pic_url)
+            streamNames.append(pic.stream_name)
+
+            #Getting the email...
+            stream_query = Stream.query(Stream.name == pic.stream_name)
+            streams = stream_query.fetch()
+            stream = streams[0]
+            emailList.append(stream.owner)
+
+        dictPassed = {
+            'urlList': urlList,
+            'streamNames' : streamNames,
+            'emailList' : emailList,
+        }
+        jsonObj = json.dumps(dictPassed, sort_keys=True,indent=4, separators=(',', ': '))
+        self.response.write(jsonObj)
+
 app = webapp2.WSGIApplication([
     ('/logincheck', LoginCheckHandler),
     ('/searchrequest', SearchRequestHandler),
@@ -1361,4 +1403,6 @@ app = webapp2.WSGIApplication([
     ('/mviewAllStreams', mViewAllStreams),
     ('/mview', mViewAStream),
     ('/mviewNearby', mViewNearby),
+    ('/mviewSubscribed', mSubscribed),
+
     ], debug=True)
