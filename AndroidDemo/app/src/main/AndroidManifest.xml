@@ -68,6 +68,10 @@
             android:name=".ViewNearbyPics"
             android:label="@string/title_activity_view_nearby_pics" >
         </activity>
+        <activity
+            android:name=".ViewSubscribed"
+            android:label="@string/title_activity_view_subscribed" >
+        </activity>
     </application>
 
 </manifest>

@@ -1,6 +1,5 @@
 package com.aptmini.jreacs.connexus;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -11,16 +10,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.squareup.picasso.Picasso;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -29,26 +23,24 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class DisplayStreams extends ActionBarActivity {
+public class ViewSubscribed extends ActionBarActivity {
     Context context = this;
-    private String TAG  = "Display All Streams";
+    private String TAG  = "Display Subscribed";
     public final static String STREAM_NAME = "com.aptmini.jreacs.connexus.STREAM_NAME";
     public final static String OWNER_EMAIL = "com.aptmini.jreacs.connexus.OWNER_EMAIL";
+    String email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display_streams);
+        setContentView(R.layout.activity_view_subscribed);
 
-        TextView morePicsText= (TextView) findViewById(R.id.subscribed);
+        email = ViewAStream.formatEmail(Homepage.email);
+        email = email.substring(0, email.indexOf('@'));
+        System.out.println("Front of email: " + email);
 
-        if (Homepage.email != null) {
-            morePicsText.setVisibility(View.VISIBLE);
-        } else {
-            morePicsText.setVisibility(View.GONE);
-        }
 
-        final String request_url = "http://apt2015mini.appspot.com/mviewAllStreams";
+        final String request_url = "http://apt2015mini.appspot.com/mviewSubscribed?owner=" + email;
         AsyncHttpClient httpClient = new AsyncHttpClient();
         httpClient.get(request_url, new AsyncHttpResponseHandler() {
             @Override
@@ -59,11 +51,11 @@ public class DisplayStreams extends ActionBarActivity {
                 try {
                     JSONObject jObject = new JSONObject(new String(response));
 
-                    JSONArray displayUrls = jObject.getJSONArray("coverURLs");
+                    JSONArray displayUrls = jObject.getJSONArray("urlList");
                     JSONArray displayNames = jObject.getJSONArray("streamNames");
-                    JSONArray displayOwner = jObject.getJSONArray("ownerEmails");
+                    JSONArray displayOwner = jObject.getJSONArray("streamNames");
 
-                    for(int i=0;i<displayNames.length() && i < Params.maxStreams;i++) {
+                    for(int i=0;i<displayNames.length() && i < Params.maxPictures;i++) {
 
                         coverURLs.add(displayUrls.getString(i));
                         streamNames.add(displayNames.getString(i));
@@ -154,8 +146,8 @@ public class DisplayStreams extends ActionBarActivity {
         startActivity(intent);
     }
 
-    public void viewSubscribed(View view) {
-        Intent intent = new Intent(this, ViewSubscribed.class);
+    public void viewAllStreams(View view) {
+        Intent intent = new Intent(this, DisplayStreams.class);
         startActivity(intent);
     }
 

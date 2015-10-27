@@ -48,6 +48,9 @@ public class ViewAStream extends ActionBarActivity {
         TextView morePicsText= (TextView) findViewById(R.id.view_more_pics_astream);
         morePicsText.setVisibility(View.VISIBLE);
 
+        TextView uploadPicText= (TextView) findViewById(R.id.upload_photo);
+        uploadPicText.setVisibility(View.VISIBLE);
+
         //Get what page we're on
         Intent intent = getIntent();
         String pic_num = intent.getStringExtra(ViewNearbyPics.PIC_NUM);
@@ -75,6 +78,7 @@ public class ViewAStream extends ActionBarActivity {
             isOwner = true;
         } else {
             isOwner = false;
+            uploadPicText.setVisibility(View.GONE);
         }
 
         stream_name = intent.getStringExtra(DisplayStreams.STREAM_NAME);
@@ -147,7 +151,7 @@ public class ViewAStream extends ActionBarActivity {
         });
     }
 
-    private String formatEmail(String email) {
+    public static String formatEmail(String email) {
         email = email.toLowerCase();
         //index = email.index('@')
         int index = email.indexOf('@');
