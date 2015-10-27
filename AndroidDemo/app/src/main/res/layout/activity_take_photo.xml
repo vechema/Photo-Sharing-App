@@ -25,5 +25,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:onClick="returnPicture"
+        android:clickable="false"
         />
 </LinearLayout>

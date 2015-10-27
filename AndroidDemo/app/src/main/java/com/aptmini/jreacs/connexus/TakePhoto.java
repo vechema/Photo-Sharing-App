@@ -40,12 +40,14 @@ public class TakePhoto extends ActionBarActivity {
     File pictureFile;
     static Camera myCamera;
     Activity mContext = this;
+    Button use_pic_button;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_photo);
+        use_pic_button = (Button) findViewById(R.id.button_choose);
 
         //create camera object
         if (myCamera == null) {
@@ -70,6 +72,9 @@ public class TakePhoto extends ActionBarActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        //enable the choose button
+                        use_pic_button = (Button) findViewById(R.id.button_choose);
+                        use_pic_button.setClickable(true);
                         // get an image from the camera
                         myCamera.takePicture(null, null, mPicture);
                     }

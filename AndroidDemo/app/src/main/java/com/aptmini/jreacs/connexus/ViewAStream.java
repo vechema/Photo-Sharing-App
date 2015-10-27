@@ -78,7 +78,7 @@ public class ViewAStream extends ActionBarActivity {
             isOwner = true;
         } else {
             isOwner = false;
-            uploadPicText.setVisibility(View.GONE);
+            //uploadPicText.setVisibility(View.GONE);
         }
 
         stream_name = intent.getStringExtra(DisplayStreams.STREAM_NAME);
