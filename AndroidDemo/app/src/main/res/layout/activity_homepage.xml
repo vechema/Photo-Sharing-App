@@ -65,5 +65,7 @@
             android:onClick="viewAllStreams"
             />
 
+
+
     </LinearLayout>
 </ScrollView>

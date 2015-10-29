@@ -109,6 +109,18 @@ public class Homepage extends ActionBarActivity implements
 
 
         mGoogleApiClient = buildGoogleApiClient();
+
+        TextView viewAll= (TextView) findViewById(R.id.view_all_streams);
+
+        //actions for if user is not connected to internet
+        if (isOnline()==false){
+            System.out.println("you have no connection");
+
+            viewAll.setVisibility(View.INVISIBLE);
+        }
+        else{
+            viewAll.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -283,6 +295,12 @@ public class Homepage extends ActionBarActivity implements
     public void onConnectionFailed(ConnectionResult result) {
         // Refer to the javadoc for ConnectionResult to see what error codes might
         // be returned in onConnectionFailed.
+
+//        System.out.println("you have no connection");
+
+//        TextView morePicsText= (TextView) findViewById(R.id.view_all_streams);
+//        morePicsText.setVisibility(View.INVISIBLE);
+
         Log.i(TAG, "onConnectionFailed: ConnectionResult.getErrorCode() = "
                 + result.getErrorCode());
 
