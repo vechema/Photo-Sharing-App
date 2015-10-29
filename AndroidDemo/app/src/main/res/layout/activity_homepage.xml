@@ -64,6 +64,13 @@
             android:id="@+id/view_all_streams"
             android:onClick="viewAllStreams"
             />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Offline Upload"
+            android:id="@+id/offline_upload"
+            android:onClick="offlineUpload"
+            />
 
 
 

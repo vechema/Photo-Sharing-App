@@ -58,6 +58,7 @@
     <string name="title_activity_view_nearby_pics">ViewNearbyPics</string>
     <string name="title_activity_view_subscribed">ViewSubscribed</string>
     <string name="title_activity_search">Search</string>
+    <string name="title_activity_offline_upload">OfflineUpload</string>
 
 
 

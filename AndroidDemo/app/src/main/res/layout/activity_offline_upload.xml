@@ -1,0 +1,77 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/response_scroll"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:scrollbars="vertical"
+    tools:context="com.aptmini.jreacs.connexus.ImageUpload"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/stream_name_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="30sp"
+            android:paddingBottom = "10sp"
+            android:text = "Enter the stream name"
+            />
+
+        <EditText
+            android:id="@+id/stream_name"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter the Stream Name Here" />
+
+        <TextView
+            android:id="@+id/stream_name_upload"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="40sp"
+            android:paddingBottom = "40sp"
+            />
+
+        <Button
+            android:id="@+id/choose_from_library"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/choose_from_library"
+            />
+
+        <Button
+            android:id="@+id/take_picture"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/takepicture"
+            android:onClick="takePicture"
+            />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/thumbnail"
+            android:adjustViewBounds="true"
+            />
+
+        <EditText
+            android:id="@+id/upload_message"
+            android:layout_width="fill_parent"
+            android:layout_height="100dp"
+            android:hint="@string/upload_hint" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/uploadImage"
+            android:clickable="false"
+            android:id="@+id/upload_to_server"
+            />
+    </LinearLayout>
+</ScrollView>

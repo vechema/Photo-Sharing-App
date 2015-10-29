@@ -111,15 +111,17 @@ public class Homepage extends ActionBarActivity implements
         mGoogleApiClient = buildGoogleApiClient();
 
         TextView viewAll= (TextView) findViewById(R.id.view_all_streams);
+        TextView offline= (TextView) findViewById(R.id.offline_upload);
 
         //actions for if user is not connected to internet
         if (isOnline()==false){
             System.out.println("you have no connection");
-
+            offline.setVisibility(View.VISIBLE);
             viewAll.setVisibility(View.INVISIBLE);
         }
         else{
             viewAll.setVisibility(View.VISIBLE);
+            offline.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -431,4 +433,9 @@ public class Homepage extends ActionBarActivity implements
         startActivity(intent);
     }
 
+    public void offlineUpload(View view) {
+        Intent intent = new Intent(this, OfflineUpload.class);
+//        startActivity(intent);
+        startActivityForResult(intent, 1);
+    }
 }
