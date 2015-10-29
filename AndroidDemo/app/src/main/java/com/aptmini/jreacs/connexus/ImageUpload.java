@@ -42,16 +42,57 @@ public class ImageUpload extends ActionBarActivity {
     private static final int PICK_IMAGE = 1;
     private static final int TAKE_IMAGE = 2;
     Context context = this;
+    static String imageFilePath;
+
 
     String streamName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        System.out.println("this is the file path: " + imageFilePath);
         Intent intent = getIntent();
         streamName = intent.getStringExtra(ViewAStream.STREAM_NAME);
         setContentView(R.layout.activity_image_upload);
         System.out.println("!!STREAM NAME: " + streamName);
+
+        if (imageFilePath != null){
+            ImageView imgView = (ImageView) findViewById(R.id.thumbnail);
+            final Bitmap bitmapImage = BitmapFactory.decodeFile(imageFilePath);
+            imgView.setImageBitmap(bitmapImage);
+
+            Button uploadButton = (Button) findViewById(R.id.upload_to_server);
+            uploadButton.setClickable(true);
+
+            uploadButton.setOnClickListener(
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            // Get photo caption
+
+                            EditText text = (EditText) findViewById(R.id.upload_message);
+                            String photoCaption = text.getText().toString();
+
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+                            byte[] b = baos.toByteArray();
+                            byte[] encodedImage = Base64.encode(b, Base64.DEFAULT);
+                            String encodedImageStr = encodedImage.toString();
+
+                            double lat = Params.latitude;
+                            double lng = Params.longitude;
+                            System.out.println("**Sent a taken photo: ");
+                            System.out.println("\tlat: " + lat);
+                            System.out.println("\tlng: " + lng);
+                            System.out.println("\tname: " + streamName);
+
+                            imageFilePath = null;
+                            getUploadURL(b, photoCaption, lat, lng, streamName);
+                        }
+                    }
+            );
+        }
 
         TextView myTextView= (TextView) findViewById(R.id.stream_name_upload);
         myTextView.setText("Stream: " + streamName);
@@ -160,7 +201,7 @@ public class ImageUpload extends ActionBarActivity {
             // Link to the image
 
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            final String imageFilePath = cursor.getString(columnIndex);
+            imageFilePath = cursor.getString(columnIndex);
             cursor.close();
 
             // Bitmap imaged created and show thumbnail
@@ -204,7 +245,7 @@ public class ImageUpload extends ActionBarActivity {
         }
         if (requestCode == TAKE_IMAGE && data != null) {
             System.out.println("TAKE IMAGE");
-            final String imageFilePath = data.getStringExtra(TakePhoto.EXTRA_FILE);
+            imageFilePath = data.getStringExtra(TakePhoto.EXTRA_FILE);
             System.out.println(imageFilePath);
             ImageView imgView = (ImageView) findViewById(R.id.thumbnail);
             System.out.println(imageFilePath);
@@ -240,6 +281,7 @@ public class ImageUpload extends ActionBarActivity {
                             System.out.println("\tlng: " + lng);
                             System.out.println("\tname: " + streamName);
 
+                            imageFilePath = null;
                             getUploadURL(b, photoCaption, lat, lng, streamName);
                         }
                     }
