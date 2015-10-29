@@ -240,6 +240,7 @@ public class OfflineUpload extends ActionBarActivity {
                             float[] latlng = getLatLong(imageFilePath);
                             float lat = latlng[0];
                             float lng = latlng[1];
+                            imageFilePath = null;
 
                             getUploadURL(b, photoCaption, lat, lng, streamName);
 

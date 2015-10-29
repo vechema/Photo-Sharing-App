@@ -7,6 +7,9 @@ import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -25,6 +28,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.apache.http.Header;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayInputStream;
 
 public class Homepage extends ActionBarActivity implements
         ConnectionCallbacks, OnConnectionFailedListener, View.OnClickListener {
@@ -122,6 +131,7 @@ public class Homepage extends ActionBarActivity implements
         else{
             viewAll.setVisibility(View.VISIBLE);
             offline.setVisibility(View.INVISIBLE);
+            PostOfflinePhotos();
         }
     }
 
@@ -437,5 +447,72 @@ public class Homepage extends ActionBarActivity implements
         Intent intent = new Intent(this, OfflineUpload.class);
 //        startActivity(intent);
         startActivityForResult(intent, 1);
+    }
+
+    public void PostOfflinePhotos(){
+        int count = 0;
+        for (OfflinePhoto photo:OfflineUpload.offlinephotos){
+            getUploadURL(photo.encodedImage, photo.photoCaption, photo.lat, photo.lng, photo.stream_name);
+            count = count + 1;
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        OfflineUpload.offlinephotos.clear();
+        System.out.println(count);
+    }
+    private void getUploadURL(final byte[] encodedImage, final String photoCaption, final double lat, final double lng, final String stream_name){
+        AsyncHttpClient httpClient = new AsyncHttpClient();
+        String request_url="http://apt2015mini.appspot.com/mgetUploadURL";
+        System.out.println(request_url);
+        httpClient.get(request_url, new AsyncHttpResponseHandler() {
+            String upload_url;
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+
+                try {
+                    JSONObject jObject = new JSONObject(new String(response));
+
+                    upload_url = jObject.getString("upload_url");
+                    postToServer(encodedImage, photoCaption, upload_url, lat, lng, stream_name);
+
+                } catch (JSONException j) {
+                    System.out.println("JSON Error");
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                Log.e("Get_serving_url", "There was a problem in retrieving the url : " + e.toString());
+            }
+        });
+    }
+
+    private void postToServer(byte[] encodedImage,String photoCaption, String upload_url, double lat, double lng, String stream_name){
+        System.out.println(upload_url);
+        RequestParams params = new RequestParams();
+        params.put("file",new ByteArrayInputStream(encodedImage));
+        params.put("photoCaption",photoCaption);
+        params.put("latitude", lat);
+        params.put("longitude", lng);
+        params.put("stream_name", stream_name);
+        System.out.println("STREAM NAME in post: " + stream_name);
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.post(upload_url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                Log.w("async", "success!!!!");
+                Toast.makeText(context, "Upload Successful", Toast.LENGTH_SHORT).show();
+//                finish();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                Log.e("Posting_to_blob", "There was a problem in retrieving the url : " + e.toString());
+            }
+        });
     }
 }

@@ -237,6 +237,7 @@ public class ImageUpload extends ActionBarActivity {
                             float lat = latlng[0];
                             float lng = latlng[1];
 
+                            imageFilePath = null;
                             getUploadURL(b, photoCaption, lat, lng, streamName);
 
                         }
